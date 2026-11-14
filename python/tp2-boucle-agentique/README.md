@@ -78,4 +78,8 @@ La question peut aussi se passer sur la ligne de commande, entre guillemets, apr
 python solution/agent.py
 ```
 
-Les causes et les corrections des trois énigmes sont dans [solution/enigmes.md](solution/enigmes.md).
+Chaque énigme a son fichier corrigé à côté d'elle, dans `enigmes/` : `enigme1_solution.py`, `enigme2_solution.py` et `enigme3_solution.py`. Les lignes modifiées portent un commentaire `CORRECTION` qui explique ce qui a changé et pourquoi. Ils se lancent comme les énigmes :
+
+```bash
+python enigmes/enigme1_solution.py
+```

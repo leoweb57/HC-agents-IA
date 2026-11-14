@@ -76,4 +76,8 @@ La question peut aussi se passer sur la ligne de commande, entre guillemets, apr
 npx tsx solution/agent.ts
 ```
 
-Les causes et les corrections des trois énigmes sont dans [solution/enigmes.md](solution/enigmes.md).
+Chaque énigme a son fichier corrigé à côté d'elle, dans `enigmes/` : `enigme1_solution.ts`, `enigme2_solution.ts` et `enigme3_solution.ts`. Les lignes modifiées portent un commentaire `CORRECTION` qui explique ce qui a changé et pourquoi. Ils se lancent comme les énigmes :
+
+```bash
+npx tsx enigmes/enigme1_solution.ts
+```
