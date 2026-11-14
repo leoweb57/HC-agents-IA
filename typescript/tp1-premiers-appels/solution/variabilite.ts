@@ -21,7 +21,6 @@ async function demander(prompt: string): Promise<string> {
     model: MODELE,
     max_tokens: 200,
     messages: [{ role: "user", content: prompt }],
-    // Pour aller plus loin : ajouter temperature: 0 ou temperature: 1 ici.
   });
   return reponse.content
     .filter((bloc) => bloc.type === "text")

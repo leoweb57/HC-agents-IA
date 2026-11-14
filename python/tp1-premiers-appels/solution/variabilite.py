@@ -26,7 +26,6 @@ def demander(prompt: str) -> str:
         model=MODELE,
         max_tokens=200,
         messages=[{"role": "user", "content": prompt}],
-        # Pour aller plus loin : ajouter temperature=0 ou temperature=1 ici.
     )
     return "".join(bloc.text for bloc in reponse.content if bloc.type == "text").strip()
 

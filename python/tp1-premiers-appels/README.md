@@ -65,7 +65,7 @@ Notez ce que vous observez :
 
 ## Pour aller plus loin
 
-- Ajoutez le paramètre `temperature` (entre 0 et 1) et comparez 0 et 1. Si l'API refuse ce paramètre pour le modèle choisi, lisez le message d'erreur : c'est une information en soi.
+- Relancez `variabilite` plusieurs fois. L'API Claude récente n'expose plus le réglage `temperature` vu en cours : ici, la variabilité se constate, elle ne se règle pas.
 - Changez de modèle dans `.env` et comparez les réponses et la consommation.
 - Ajoutez un paramètre `system` pour donner un rôle au modèle, et regardez ce que ça change.
 
