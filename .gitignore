@@ -11,3 +11,8 @@ node_modules/
 .idea/
 .vscode/
 .DS_Store
+
+# TP 4
+.chainlit/
+.files/
+demandes_intervention.json
