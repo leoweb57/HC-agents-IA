@@ -1,0 +1,10 @@
+[
+  { "id": "OF-2228", "article": "Boîtier B12", "machine_id": "P1", "quantite_prevue": 4000, "quantite_produite": 4000, "statut": "terminé", "debut": "2026-03-09T06:00", "fin": "2026-03-10T13:40" },
+  { "id": "OF-2229", "article": "Capot C07", "machine_id": "P2", "quantite_prevue": 2500, "quantite_produite": 2500, "statut": "terminé", "debut": "2026-03-09T06:00", "fin": "2026-03-10T21:10" },
+  { "id": "OF-2230", "article": "Support S33", "machine_id": "P3", "quantite_prevue": 6000, "quantite_produite": 5820, "statut": "terminé", "debut": "2026-03-10T06:00", "fin": "2026-03-12T05:30" },
+  { "id": "OF-2231", "article": "Boîtier B14", "machine_id": "P4", "quantite_prevue": 3000, "quantite_produite": 1740, "statut": "en cours", "debut": "2026-03-12T06:00", "fin": null },
+  { "id": "OF-2232", "article": "Capot C09", "machine_id": "P2", "quantite_prevue": 1800, "quantite_produite": 1800, "statut": "terminé", "debut": "2026-03-11T06:00", "fin": "2026-03-12T11:20" },
+  { "id": "OF-2233", "article": "Boîtier B12", "machine_id": "P1", "quantite_prevue": 4000, "quantite_produite": 2950, "statut": "en cours", "debut": "2026-03-11T14:00", "fin": null },
+  { "id": "OF-2234", "article": "Ensemble E02", "machine_id": "A1", "quantite_prevue": 1200, "quantite_produite": 640, "statut": "en cours", "debut": "2026-03-12T06:00", "fin": null },
+  { "id": "OF-2235", "article": "Support S35", "machine_id": "P3", "quantite_prevue": 5000, "quantite_produite": 0, "statut": "planifié", "debut": "2026-03-13T14:00", "fin": null }
+]

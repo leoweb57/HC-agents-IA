@@ -1,0 +1,12 @@
+[
+  { "id": "CQ-9001", "of_id": "OF-2228", "date": "2026-03-09T11:00", "echantillon": 50, "non_conformes": 0, "defaut_principal": null, "decision": "accepté" },
+  { "id": "CQ-9002", "of_id": "OF-2229", "date": "2026-03-09T17:00", "echantillon": 50, "non_conformes": 3, "defaut_principal": "retassure", "decision": "accepté sous réserve" },
+  { "id": "CQ-9003", "of_id": "OF-2230", "date": "2026-03-10T10:00", "echantillon": 80, "non_conformes": 1, "defaut_principal": "bavure", "decision": "accepté" },
+  { "id": "CQ-9004", "of_id": "OF-2230", "date": "2026-03-11T05:00", "echantillon": 80, "non_conformes": 9, "defaut_principal": "pièce incomplète", "decision": "lot bloqué" },
+  { "id": "CQ-9005", "of_id": "OF-2232", "date": "2026-03-11T09:00", "echantillon": 50, "non_conformes": 0, "defaut_principal": null, "decision": "accepté" },
+  { "id": "CQ-9006", "of_id": "OF-2233", "date": "2026-03-12T09:10", "echantillon": 50, "non_conformes": 6, "defaut_principal": "bavure", "decision": "lot bloqué" },
+  { "id": "CQ-9007", "of_id": "OF-2233", "date": "2026-03-12T10:30", "echantillon": 50, "non_conformes": 1, "defaut_principal": "bavure", "decision": "accepté" },
+  { "id": "CQ-9008", "of_id": "OF-2231", "date": "2026-03-12T14:00", "echantillon": 50, "non_conformes": 0, "defaut_principal": null, "decision": "accepté" },
+  { "id": "CQ-9009", "of_id": "OF-2234", "date": "2026-03-12T15:00", "echantillon": 30, "non_conformes": 2, "defaut_principal": "vis manquante", "decision": "accepté sous réserve" },
+  { "id": "CQ-9010", "of_id": "OF-2231", "date": "2026-03-13T09:30", "echantillon": 50, "non_conformes": 4, "defaut_principal": "trace d'éjecteur", "decision": "accepté sous réserve" }
+]

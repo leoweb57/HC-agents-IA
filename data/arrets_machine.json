@@ -1,0 +1,14 @@
+[
+  { "id": "AR-501", "machine_id": "P1", "of_id": "OF-2228", "debut": "2026-03-09T10:12", "duree_min": 18, "categorie": "réglage", "cause": "Changement de buse", "commentaire": "Buse usée, remplacée par la maintenance." },
+  { "id": "AR-502", "machine_id": "P2", "of_id": "OF-2229", "debut": "2026-03-09T15:40", "duree_min": 45, "categorie": "panne", "cause": "Défaut du capteur de température", "commentaire": "Sonde zone 3 remplacée." },
+  { "id": "AR-503", "machine_id": "P3", "of_id": "OF-2230", "debut": "2026-03-10T08:05", "duree_min": 12, "categorie": "approvisionnement", "cause": "Rupture de matière", "commentaire": "Trémie vide, réappro en retard de 10 min." },
+  { "id": "AR-504", "machine_id": "P3", "of_id": "OF-2230", "debut": "2026-03-11T02:30", "duree_min": 95, "categorie": "panne", "cause": "Fuite hydraulique", "commentaire": "Flexible changé par l'équipe de nuit." },
+  { "id": "AR-505", "machine_id": "P2", "of_id": "OF-2232", "debut": "2026-03-11T06:00", "duree_min": 35, "categorie": "changement de série", "cause": "Changement de moule", "commentaire": "Passage du Capot C07 au Capot C09." },
+  { "id": "AR-506", "machine_id": "A1", "of_id": null, "debut": "2026-03-11T13:00", "duree_min": 60, "categorie": "maintenance préventive", "cause": "Graissage et contrôle des convoyeurs", "commentaire": "Planifié." },
+  { "id": "AR-507", "machine_id": "P1", "of_id": "OF-2233", "debut": "2026-03-12T09:20", "duree_min": 22, "categorie": "qualité", "cause": "Bavures sur les pièces", "commentaire": "Pression de maintien corrigée." },
+  { "id": "AR-508", "machine_id": "P4", "of_id": "OF-2231", "debut": "2026-03-12T16:45", "duree_min": 28, "categorie": "réglage", "cause": "Dérive du temps de cycle", "commentaire": "Paramètres repris par le régleur." },
+  { "id": "AR-509", "machine_id": "A1", "of_id": "OF-2234", "debut": "2026-03-13T07:10", "duree_min": 15, "categorie": "approvisionnement", "cause": "Attente de composants", "commentaire": "Livraison interne en retard." },
+  { "id": "AR-510", "machine_id": "P4", "of_id": "OF-2231", "debut": "2026-03-13T07:42", "duree_min": 74, "categorie": "panne", "cause": "Défaut d'éjection", "commentaire": "Éjecteur grippé, pièce restée dans le moule. Redémarrage à 8 h 56." },
+  { "id": "AR-511", "machine_id": "P1", "of_id": "OF-2233", "debut": "2026-03-13T09:30", "duree_min": 9, "categorie": "micro-arrêt", "cause": "Bourrage au tapis de sortie", "commentaire": "" },
+  { "id": "AR-512", "machine_id": "C1", "of_id": null, "debut": "2026-03-13T10:15", "duree_min": 40, "categorie": "étalonnage", "cause": "Étalonnage du banc de mesure", "commentaire": "Contrôles en attente pendant l'étalonnage." }
+]
