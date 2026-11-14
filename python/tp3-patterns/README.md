@@ -4,7 +4,7 @@
 
 ## Objectif
 
-- Lire une implémentation simple de ReAct, de Plan-and-Execute et de Reflection.
+- Lire une implémentation simple de ReAct, de Plan-and-Execute (avec et sans replanification) et de Reflection.
 - Comparer ce que chacun coûte, sur la même demande et avec les mêmes outils.
 - Voir ce que change le niveau de raisonnement du modèle.
 
@@ -31,6 +31,7 @@ Toutes les commandes se lancent depuis ce dossier.
 |---|---|
 | `react.py` | La boucle du TP 2, rangée dans une fonction. Les autres fichiers la réutilisent. |
 | `plan_et_execution.py` | Un appel pour écrire le plan, une boucle par étape, un appel pour la synthèse. |
+| `replanification.py` | La variante : après chaque étape, un appel révise la suite du plan. |
 | `reflection.py` | Un premier jet, une relecture sur des critères écrits, une correction si besoin. |
 | `raisonnement.py` | La même boucle ReAct avec deux niveaux d'effort de raisonnement. |
 | `comparer.py` | Lance les trois patterns et affiche un tableau : appels au modèle et tokens. |
@@ -38,6 +39,7 @@ Toutes les commandes se lancent depuis ce dossier.
 ```bash
 python react.py
 python plan_et_execution.py
+python replanification.py
 python reflection.py
 python raisonnement.py
 python comparer.py
@@ -51,9 +53,10 @@ Avec Claude Haiku 5.5, le 14 novembre 2026. Vos chiffres varieront d'un essai à
 |---|---|---|---|
 | ReAct | 3 | environ 4 200 | environ 900 |
 | Plan-and-Execute | 10 | environ 17 000 | environ 5 000 |
+| Plan-and-Execute avec replanification | 13 à 15 | 24 000 à 32 000 | 7 000 à 10 000 |
 | Reflection | 6 ou 7 | 14 000 à 17 000 | 3 000 à 5 000 |
 
-Les trois réponses contiennent les mêmes faits. Sur une demande de cette taille, ReAct suffit : les deux autres patterns coûtent quatre fois plus pour un résultat équivalent.
+Les trois réponses contiennent les mêmes faits. Sur une demande de cette taille, ReAct suffit : les autres patterns coûtent quatre à sept fois plus pour un résultat équivalent.
 
 Pour le niveau de raisonnement : entre `low` et `high`, le modèle a fait les mêmes trois appels, avec 20 à 35 % de tokens en sortie en plus.
 

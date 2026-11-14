@@ -12,7 +12,7 @@ const PLANIFICATEUR =
   "N'appelle aucun outil maintenant. Réponds uniquement par une liste JSON de chaînes de caractères.";
 
 /** 1. Planifier : un seul appel, sans exécuter d'outil. */
-async function planifier(compteur: Compteur): Promise<string[]> {
+export async function planifier(compteur: Compteur): Promise<string[]> {
   const reponse = await appeler(compteur, [{ role: "user", content: QUESTION }], PLANIFICATEUR);
   const brut = texte(reponse);
   // Le modèle entoure parfois le JSON de texte : on garde ce qui est entre les crochets.
@@ -20,7 +20,7 @@ async function planifier(compteur: Compteur): Promise<string[]> {
 }
 
 /** 2. Exécuter : une petite boucle ReAct par étape, avec les résultats des étapes précédentes. */
-async function executerEtape(etape: string, notes: string[], compteur: Compteur, bavard: boolean): Promise<string> {
+export async function executerEtape(etape: string, notes: string[], compteur: Compteur, bavard: boolean): Promise<string> {
   const consigne =
     `Demande d'origine : ${QUESTION}\n\n` +
     `Résultats déjà obtenus :\n${notes.join("\n") || "aucun"}\n\n` +
@@ -30,7 +30,7 @@ async function executerEtape(etape: string, notes: string[], compteur: Compteur,
 }
 
 /** 3. Synthétiser : un dernier appel, à partir des résultats de toutes les étapes. */
-async function synthetiser(notes: string[], compteur: Compteur): Promise<string> {
+export async function synthetiser(notes: string[], compteur: Compteur): Promise<string> {
   const consigne = `Demande : ${QUESTION}\n\nRésultats des étapes :\n${notes.join("\n")}\n\nRédige la réponse finale.`;
   return texte(await appeler(compteur, [{ role: "user", content: consigne }]));
 }
