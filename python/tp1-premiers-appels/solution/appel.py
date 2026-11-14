@@ -1,7 +1,7 @@
-"""TP 1, étape 2 : un premier appel à l'API Messages (solution).
+"""TP 1, étape 1 : un premier appel à l'API Messages (solution).
 
-Lancement, depuis le dossier python/ :
-    python tp1-premiers-appels/solution/appel.py
+Lancement, depuis le dossier du TP :
+    python solution/appel.py
 """
 
 import os
@@ -9,9 +9,9 @@ import os
 import anthropic
 from dotenv import find_dotenv, load_dotenv
 
-load_dotenv(find_dotenv())
+load_dotenv(find_dotenv())  # lit le fichier .env à la racine du dépôt
 
-MODELE = os.environ.get("MODELE") or "claude-haiku-5-5"
+MODELE = os.environ["MODELE"]
 PROMPT = "Explique en deux phrases ce qu'est un MES (Manufacturing Execution System)."
 
 # Le client lit ANTHROPIC_API_KEY dans l'environnement.
@@ -31,4 +31,3 @@ print()
 print(f"Modèle : {reponse.model}")
 print(f"Tokens en entrée : {reponse.usage.input_tokens}")
 print(f"Tokens en sortie : {reponse.usage.output_tokens}")
-print(f"Raison de l'arrêt : {reponse.stop_reason}")

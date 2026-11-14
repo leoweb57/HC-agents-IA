@@ -1,13 +1,14 @@
-// TP 1, étape 2 : un premier appel à l'API Messages.
+// TP 1, étape 1 : un premier appel à l'API Messages.
 //
-// Lancement, depuis le dossier typescript/ :
-//   npx tsx tp1-premiers-appels/depart/appel.ts
+// Lancement, depuis le dossier du TP :
+//   npx tsx exercice/appel.ts
 
-import { MODELE } from "../../env.ts";
+process.loadEnvFile("../../.env"); // lit le fichier .env à la racine du dépôt
 
+const MODELE = process.env.MODELE ?? "";
 const PROMPT = "Explique en deux phrases ce qu'est un MES (Manufacturing Execution System).";
 
-// À FAIRE 1 : importer le SDK et créer le client.
+// À FAIRE 1 : importer le SDK (import Anthropic from "@anthropic-ai/sdk") et créer le client.
 //   La clé ANTHROPIC_API_KEY est lue automatiquement dans l'environnement.
 
 // À FAIRE 2 : envoyer PROMPT au modèle avec client.messages.create({...})
@@ -18,4 +19,4 @@ const PROMPT = "Explique en deux phrases ce qu'est un MES (Manufacturing Executi
 
 // À FAIRE 4 : afficher les tokens consommés en entrée et en sortie (usage).
 
-console.log(`Modèle configuré : ${MODELE}. Prompt à envoyer : ${PROMPT}`);
+export {};

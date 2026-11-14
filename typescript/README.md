@@ -1,32 +1,13 @@
 # TP en TypeScript
 
-Prérequis : Node.js 20.12 ou plus récent (22 LTS conseillé).
+Prérequis : Node.js 20.12 ou plus récent (npm est fourni avec Node).
 
-## Installation
+Avant chaque TP, vérifiez que le fichier `.env` à la racine du dépôt contient votre clé API et le nom du modèle à utiliser. Si un TP demande de changer de modèle ou de fournisseur, c'est dans ce fichier que ça se passe.
 
-Depuis le dossier `typescript/` :
+## Les TP
 
-```bash
-npm install
-```
+| TP | Sujet | Jour | Durée |
+|---|---|---|---|
+| [TP 1](tp1-premiers-appels/README.md) | Premiers appels à l'API, constater la variabilité | 1 | 30 min |
 
-## Vérifier l'environnement
-
-```bash
-npm run verifier
-```
-
-Le script contrôle la version de Node, la présence de la clé dans `.env` (à la racine du dépôt) et fait un appel minimal à l'API. Il doit se terminer par `Tout est en place.`
-
-En cas d'échec, il indique la cause la plus probable : clé absente ou invalide, modèle inconnu, proxy ou réseau.
-
-## Lancer un TP
-
-Chaque TP se lance depuis le dossier `typescript/`, par exemple :
-
-```bash
-npx tsx tp1-premiers-appels/depart/appel.ts
-```
-
-Les fichiers sont exécutés directement avec `tsx`, sans étape de compilation.
-Le fichier `env.ts` charge le `.env` de la racine et expose le modèle à utiliser : chaque TP l'importe en première ligne.
+Chaque dossier de TP contient son énoncé, ses dépendances, un dossier `exercice/` et un dossier `solution/`.

@@ -4,25 +4,28 @@
 
 ## Objectif
 
-- Avoir un environnement qui tourne sur votre poste.
 - Envoyer un premier message à l'API et lire la réponse.
-- Constater par vous-même deux choses vues en cours : deux essais ne donnent pas la même réponse, et le modèle ne sait rien de votre atelier.
+- Constater deux choses vues en cours : deux essais ne donnent pas la même réponse, et le modèle ne sait rien de votre atelier.
 
-Tout se passe dans `depart/`. La solution est dans `solution/`.
+Vous écrivez dans `exercice/`. Une solution est dans `solution/`.
 
-## Étape 1 — Installer (10 min)
+## Installation
 
-Suivez [python/README.md](../README.md), puis :
+1. Mettre votre clé API dans le fichier `.env` à la racine du dépôt.
+2. Dans ce dossier, installer les dépendances :
 
-```bash
-python verifier_env.py
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Vous devez voir `Tout est en place.` avant de continuer.
+   Si pip refuse d'installer hors d'un environnement virtuel, créez-en un d'abord :
+   `python -m venv .venv` puis `source .venv/bin/activate` (Windows : `.venv\Scripts\activate`).
 
-## Étape 2 — Un premier appel (10 min)
+Toutes les commandes se lancent depuis ce dossier.
 
-Ouvrez `depart/appel.py` et complétez-le pour :
+## Étape 1 — Un premier appel (15 min)
+
+Complétez `exercice/appel.py` pour :
 
 1. créer le client Anthropic ;
 2. envoyer le prompt `PROMPT` au modèle ;
@@ -30,7 +33,7 @@ Ouvrez `depart/appel.py` et complétez-le pour :
 4. afficher le nombre de tokens en entrée et en sortie.
 
 ```bash
-python tp1-premiers-appels/depart/appel.py
+python exercice/appel.py
 ```
 
 Repères :
@@ -40,9 +43,11 @@ Repères :
 - la réponse contient une liste de blocs dans `content` ; le texte est dans les blocs dont le `type` vaut `"text"` ;
 - la consommation est dans `usage.input_tokens` et `usage.output_tokens`.
 
-## Étape 3 — Comparer (10 min)
+Si l'appel répond, votre environnement est bon. Une erreur d'authentification signifie que la clé dans `.env` est absente ou incorrecte.
 
-Ouvrez `depart/variabilite.py` et complétez-le pour envoyer **cinq fois** le même prompt et afficher les cinq réponses l'une sous l'autre.
+## Étape 2 — Comparer (15 min)
+
+Complétez `exercice/variabilite.py` pour envoyer **cinq fois** le même prompt et afficher les cinq réponses l'une sous l'autre.
 
 Faites-le avec les deux prompts fournis dans le fichier :
 
@@ -50,7 +55,7 @@ Faites-le avec les deux prompts fournis dans le fichier :
 - `PROMPT_ATELIER` : une question dont la réponse est dans les données de l'atelier, que le modèle n'a pas.
 
 ```bash
-python tp1-premiers-appels/depart/variabilite.py
+python exercice/variabilite.py
 ```
 
 Notez ce que vous observez :
@@ -61,5 +66,12 @@ Notez ce que vous observez :
 ## Pour aller plus loin
 
 - Ajoutez le paramètre `temperature` (entre 0 et 1) et comparez 0 et 1. Si l'API refuse ce paramètre pour le modèle choisi, lisez le message d'erreur : c'est une information en soi.
-- Changez de modèle dans `.env` (variable `MODELE`) et comparez les réponses et la consommation.
+- Changez de modèle dans `.env` et comparez les réponses et la consommation.
 - Ajoutez un paramètre `system` pour donner un rôle au modèle, et regardez ce que ça change.
+
+## Solution
+
+```bash
+python solution/appel.py
+python solution/variabilite.py
+```

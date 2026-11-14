@@ -1,31 +1,13 @@
 # TP en Python
 
-Prérequis : Python 3.10 ou plus récent.
+Prérequis : Python 3.10 ou plus récent (pip est fourni avec Python).
 
-## Installation
+Avant chaque TP, vérifiez que le fichier `.env` à la racine du dépôt contient votre clé API et le nom du modèle à utiliser. Si un TP demande de changer de modèle ou de fournisseur, c'est dans ce fichier que ça se passe.
 
-Depuis le dossier `python/` :
+## Les TP
 
-```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows : .venv\Scripts\activate
-pip install -r requirements.txt
-```
+| TP | Sujet | Jour | Durée |
+|---|---|---|---|
+| [TP 1](tp1-premiers-appels/README.md) | Premiers appels à l'API, constater la variabilité | 1 | 30 min |
 
-## Vérifier l'environnement
-
-```bash
-python verifier_env.py
-```
-
-Le script contrôle la version de Python, la présence de la clé dans `.env` (à la racine du dépôt) et fait un appel minimal à l'API. Il doit se terminer par `Tout est en place.`
-
-En cas d'échec, il indique la cause la plus probable : clé absente ou invalide, modèle inconnu, proxy ou réseau.
-
-## Lancer un TP
-
-Chaque TP se lance depuis le dossier `python/`, par exemple :
-
-```bash
-python tp1-premiers-appels/depart/appel.py
-```
+Chaque dossier de TP contient son énoncé, ses dépendances, un dossier `exercice/` et un dossier `solution/`.

@@ -1,27 +1,28 @@
 # Formation Agents IA — travaux pratiques
 
 Dépôt des exercices de la formation « Agents IA » (3 jours).
-Chaque TP existe en **Python** et en **TypeScript** : choisissez votre langage et restez-y.
+Chaque TP existe en **Python** et en **TypeScript** : choisissez votre langage.
 
 ## Organisation
 
 ```
+.env           Votre clé API et le nom du modèle, lus par tous les TP
 data/          Données fictives de l'atelier, communes aux deux langages
 python/        Les TP en Python
 typescript/    Les TP en TypeScript
 ```
 
-Chaque TP a son dossier numéroté, avec trois éléments :
+Chaque TP a son dossier numéroté, avec :
 
-- `README.md` : l'énoncé
-- `depart/` : le point de départ, presque vide, là où vous écrivez votre code
+- `README.md` : l'énoncé, l'installation et les commandes
+- `exercice/` : là où vous écrivez votre code
 - `solution/` : une solution possible, à ouvrir quand vous le décidez
 
-Chaque TP repart d'une page blanche. Si vous voulez réutiliser votre code d'un TP précédent, copiez-le depuis son dossier.
+Chaque TP repart d'une page blanche. Pour réutiliser votre code d'un TP précédent, copiez-le depuis son dossier.
 
 Le dépôt est en lecture seule : clonez-le et travaillez en local.
 
-## Mise en route (10 minutes)
+## Avant de commencer
 
 1. Cloner le dépôt
 
@@ -30,25 +31,9 @@ Le dépôt est en lecture seule : clonez-le et travaillez en local.
    cd HC-agents-IA
    ```
 
-2. Créer le fichier `.env` à la racine, à partir du modèle
+2. Ouvrir le fichier `.env` à la racine et y mettre votre clé API Anthropic. Le nom du modèle s'y trouve aussi.
 
-   ```bash
-   cp .env.example .env
-   ```
-
-   Puis coller votre clé API Anthropic dans `.env`. Ce fichier n'est jamais versionné.
-
-3. Installer les dépendances de votre langage : voir [python/README.md](python/README.md) ou [typescript/README.md](typescript/README.md).
-
-4. Lancer le script de vérification indiqué dans ce README. Il doit afficher `Tout est en place.`
-
-## Les TP
-
-| TP | Sujet | Jour | Durée |
-|---|---|---|---|
-| TP 1 | Premiers appels à l'API, constater la variabilité | 1 | 30 min |
-
-Les TP suivants sont ajoutés au fil de la formation.
+3. Aller dans le dossier de votre langage : [python/](python/README.md) ou [typescript/](typescript/README.md).
 
 ## Le fil rouge
 
