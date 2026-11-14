@@ -79,8 +79,6 @@ Si vous avez fini, au choix :
 
 ## Solution
 
-```bash
-npx tsx solution/question.ts
-npx tsx solution/terminal.ts
-npx tsx solution/interface.ts
-```
+`solution/agent.ts` est le fichier `exercice/agent.ts` une fois les huit étapes terminées. Ses commentaires « Pourquoi » expliquent les choix. Comparez-le au vôtre.
+
+Les trois programmes (`question.ts`, `terminal.ts`, `interface.ts`) et la page `interface.html` n'existent que dans `exercice/` : il n'y a rien à y corriger. Pour voir tourner la solution, copiez `solution/agent.ts` à la place de `exercice/agent.ts`, puis relancez-les.

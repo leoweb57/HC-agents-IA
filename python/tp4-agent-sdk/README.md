@@ -79,8 +79,6 @@ Si vous avez fini, au choix :
 
 ## Solution
 
-```bash
-python solution/question.py
-python solution/terminal.py
-chainlit run solution/interface.py
-```
+`solution/agent.py` est le fichier `exercice/agent.py` une fois les huit étapes terminées. Ses commentaires « Pourquoi » expliquent les choix. Comparez-le au vôtre.
+
+Les trois programmes (`question.py`, `terminal.py`, `interface.py`) n'existent que dans `exercice/` : il n'y a rien à y corriger. Pour voir tourner la solution, copiez `solution/agent.py` à la place de `exercice/agent.py`, puis relancez-les.

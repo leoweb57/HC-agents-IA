@@ -13,4 +13,4 @@ Avant chaque TP, vérifiez que le fichier `.env` à la racine du dépôt contien
 | [TP 3](tp3-patterns/README.md) | Trois patterns d'agents côte à côte (lecture libre) | 1 | libre |
 | [TP 4](tp4-agent-sdk/README.md) | L'agent d'atelier avec l'Agent SDK, jusqu'à l'interface de discussion | 1 | 1 h 35 |
 
-Chaque dossier de TP contient son énoncé, ses dépendances, un dossier `exercice/` et un dossier `solution/`. Le TP 2 a en plus un dossier `enigmes/`. Le TP 3 fait exception : c'est du code complet, à lire et à lancer.
+Chaque dossier de TP contient son énoncé, ses dépendances, un dossier `exercice/` et un dossier `solution/`. Le TP 2 a en plus un dossier `enigmes/`. Le TP 3 fait exception : c'est du code complet, à lire et à lancer. Dans le TP 4, `solution/` ne contient que le fichier à compléter, corrigé.

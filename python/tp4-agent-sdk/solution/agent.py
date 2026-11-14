@@ -1,10 +1,9 @@
 """TP 4 : l'agent d'atelier avec l'Agent SDK (solution).
 
-Ce fichier décrit l'agent : ses outils, son prompt système, ses règles.
-Il ne se lance pas seul. Trois programmes s'en servent :
-    python solution/question.py     une seule question, comme au TP 2
-    python solution/terminal.py     une conversation dans le terminal
-    chainlit run solution/interface.py     une interface de discussion dans le navigateur
+C'est le fichier exercice/agent.py une fois les huit étapes terminées.
+Les commentaires « Pourquoi » expliquent les choix.
+
+Pour le voir tourner, copiez-le à la place de exercice/agent.py, puis lancez les programmes de exercice/.
 """
 
 import json
@@ -26,7 +25,8 @@ from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv())  # lit le fichier .env à la racine du dépôt
 
-# Le SDK prévient que les outils de allowed_tools ne passent pas par can_use_tool : c'est voulu ici.
+# Pourquoi : le SDK avertit que les outils de allowed_tools ne passeront pas par can_use_tool.
+# C'est exactement ce qu'on veut (les lectures passent d'office), donc on masque l'avertissement.
 warnings.filterwarnings("ignore", category=CanUseToolShadowedWarning)
 
 MODELE = os.environ["MODELE"]
@@ -36,7 +36,13 @@ PROCEDURES = TP / "procedures"
 DEMANDES = TP / "demandes_intervention.json"
 
 
-# ---------- 1. Le prompt système : rôle, contexte, règles, format ----------
+# ---------- 1. Le prompt système : rôle, contexte, règles, format (étape 4) ----------
+
+# Pourquoi quatre parties : le modèle relit ce texte à chaque tour. On y met ce qui doit rester vrai
+# tout au long de la conversation, et rien d'autre. La date est indispensable : sans elle,
+# « ce matin » ne veut rien dire pour le modèle.
+# Pourquoi la règle sur les demandes d'intervention est aussi ici : le prompt oriente le modèle,
+# mais ce n'est pas lui qui protège. La vraie protection est la fonction de permission, plus bas.
 
 SYSTEME = (
     # Le rôle
@@ -52,7 +58,10 @@ SYSTEME = (
 )
 
 
-# ---------- 2. Les outils de l'atelier ----------
+# ---------- 2. Les outils de l'atelier (étapes 1, 2 et 7) ----------
+
+# Pourquoi les descriptions sont aussi détaillées : c'est tout ce que le modèle voit d'un outil.
+# La correspondance « presse 4 = P4 » est écrite dans la description du paramètre (énigme 1 du TP 2).
 
 def charger(fichier: str) -> list[dict]:
     return json.loads((DATA / fichier).read_text(encoding="utf-8"))
@@ -85,6 +94,8 @@ async def lire_ordre_fabrication(args: dict[str, Any]) -> dict[str, Any]:
 
 
 # Un outil d'action : il écrit. Il ne s'exécute qu'après l'accord d'une personne (voir plus bas).
+# Pourquoi il est déclaré comme les autres : pour le SDK, lecture ou action, c'est le même objet.
+# La différence se fait dans les permissions, pas dans la déclaration.
 @tool(
     "creer_demande_intervention",
     "Crée une demande d'intervention de maintenance pour une machine. À n'utiliser que si l'utilisateur le demande.",
@@ -114,14 +125,21 @@ OUTILS_DE_LECTURE = ["mcp__atelier__lister_arrets", "mcp__atelier__lire_ordre_fa
 OUTIL_D_ACTION = "mcp__atelier__creer_demande_intervention"
 
 
-# ---------- 3. La trace : un hook appelé avant chaque outil ----------
+# ---------- 3. La trace : un hook appelé avant chaque outil (étape 6) ----------
+
+# Pourquoi un hook plutôt qu'un print dans chaque outil : le hook voit tous les outils,
+# y compris Read, qui n'est pas notre code. Il renvoie {} : il observe, il ne bloque rien.
 
 async def journal(donnees, tool_use_id, contexte):
     print(f"  [journal] {donnees['tool_name']}({json.dumps(donnees['tool_input'], ensure_ascii=False)})")
     return {}
 
 
-# ---------- 4. Les permissions : qui décide pour les outils qui ne sont pas autorisés d'office ----------
+# ---------- 4. Les permissions : qui décide pour les outils qui ne sont pas autorisés d'office (étapes 7 et 8) ----------
+
+# Pourquoi une fonction qui en fabrique une autre : la façon de demander l'accord dépend du programme
+# (une question au clavier dans terminal.py, deux boutons dans interface.py). L'agent ne change pas.
+# Pourquoi tout refuser à la fin : un outil qu'on n'a pas prévu ne doit jamais passer par défaut.
 
 def creer_permission(demander_accord):
     """Fabrique la fonction que le SDK appelle pour chaque outil absent de allowed_tools."""
@@ -135,6 +153,7 @@ def creer_permission(demander_accord):
 
         # Read, l'outil intégré du SDK : seulement dans le dossier des procédures.
         if nom_outil == "Read":
+            # Pourquoi resolve() : pour qu'un chemin comme ../../.env soit ramené à son vrai dossier avant le test.
             chemin = Path(parametres.get("file_path", ""))
             chemin = (chemin if chemin.is_absolute() else PROCEDURES / chemin).resolve()
             if chemin.parent == PROCEDURES:
@@ -146,7 +165,13 @@ def creer_permission(demander_accord):
     return autoriser
 
 
-# ---------- 5. Les options : tout ce qui décrit l'agent ----------
+# ---------- 5. Les options : tout ce qui décrit l'agent (étapes 3, 5, 6, 7 et 8) ----------
+
+# Pourquoi tools et allowed_tools sont deux listes : tools dit quels outils intégrés existent pour le modèle,
+# allowed_tools dit lesquels s'exécutent sans rien demander. L'outil d'action et Read n'y sont pas :
+# ils passent donc par can_use_tool.
+# Pourquoi setting_sources=[] : sans cela, le SDK charge les réglages de Claude Code s'il est installé
+# sur la machine, et l'agent ne se comporte plus de la même façon d'un poste à l'autre.
 
 def creer_options(session_id: str | None = None, demander_accord=None) -> ClaudeAgentOptions:
     return ClaudeAgentOptions(

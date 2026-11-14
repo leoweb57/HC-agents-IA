@@ -1,10 +1,9 @@
 // TP 4 : l'agent d'atelier avec l'Agent SDK (solution).
 //
-// Ce fichier décrit l'agent : ses outils, son prompt système, ses règles.
-// Il ne se lance pas seul. Trois programmes s'en servent, depuis le dossier du TP :
-//   npx tsx solution/question.ts     une seule question, comme au TP 2
-//   npx tsx solution/terminal.ts     une conversation dans le terminal
-//   npx tsx solution/interface.ts    une interface de discussion dans le navigateur
+// C'est le fichier exercice/agent.ts une fois les huit étapes terminées.
+// Les commentaires « Pourquoi » expliquent les choix.
+//
+// Pour le voir tourner, copiez-le à la place de exercice/agent.ts, puis lancez les programmes de exercice/.
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -19,7 +18,8 @@ import { z } from "zod";
 
 process.loadEnvFile("../../.env"); // lit le fichier .env à la racine du dépôt
 
-// Le SDK prévient que les outils de allowedTools ne passent pas par canUseTool : c'est voulu ici.
+// Pourquoi : le SDK avertit que les outils de allowedTools ne passeront pas par canUseTool.
+// C'est exactement ce qu'on veut (les lectures passent d'office), donc on masque l'avertissement.
 process.removeAllListeners("warning");
 
 const MODELE = process.env.MODELE ?? "";
@@ -27,7 +27,13 @@ const DATA = "../../data";
 const PROCEDURES = path.resolve("procedures");
 const DEMANDES = path.resolve("demandes_intervention.json");
 
-// ---------- 1. Le prompt système : rôle, contexte, règles, format ----------
+// ---------- 1. Le prompt système : rôle, contexte, règles, format (étape 4) ----------
+
+// Pourquoi quatre parties : le modèle relit ce texte à chaque tour. On y met ce qui doit rester vrai
+// tout au long de la conversation, et rien d'autre. La date est indispensable : sans elle,
+// « ce matin » ne veut rien dire pour le modèle.
+// Pourquoi la règle sur les demandes d'intervention est aussi ici : le prompt oriente le modèle,
+// mais ce n'est pas lui qui protège. La vraie protection est la fonction de permission, plus bas.
 
 const SYSTEME =
   // Le rôle
@@ -41,7 +47,10 @@ const SYSTEME =
   // Le format
   "Réponds en français, en trois phrases au plus.";
 
-// ---------- 2. Les outils de l'atelier ----------
+// ---------- 2. Les outils de l'atelier (étapes 1, 2 et 7) ----------
+
+// Pourquoi les descriptions sont aussi détaillées : c'est tout ce que le modèle voit d'un outil.
+// La correspondance « presse 4 = P4 » est écrite dans la description du paramètre (énigme 1 du TP 2).
 
 type Enregistrement = Record<string, unknown>;
 
@@ -78,6 +87,8 @@ const lireOrdreFabrication = tool(
 );
 
 // Un outil d'action : il écrit. Il ne s'exécute qu'après l'accord d'une personne (voir plus bas).
+// Pourquoi il est déclaré comme les autres : pour le SDK, lecture ou action, c'est le même objet.
+// La différence se fait dans les permissions, pas dans la déclaration.
 const creerDemandeIntervention = tool(
   "creer_demande_intervention",
   "Crée une demande d'intervention de maintenance pour une machine. À n'utiliser que si l'utilisateur le demande.",
@@ -106,7 +117,10 @@ const atelier = createSdkMcpServer({
 const OUTILS_DE_LECTURE = ["mcp__atelier__lister_arrets", "mcp__atelier__lire_ordre_fabrication"];
 const OUTIL_D_ACTION = "mcp__atelier__creer_demande_intervention";
 
-// ---------- 3. La trace : un hook appelé avant chaque outil ----------
+// ---------- 3. La trace : un hook appelé avant chaque outil (étape 6) ----------
+
+// Pourquoi un hook plutôt qu'un console.log dans chaque outil : le hook voit tous les outils,
+// y compris Read, qui n'est pas notre code. Il renvoie {} : il observe, il ne bloque rien.
 
 const journal: HookCallback = async (donnees) => {
   if (donnees.hook_event_name === "PreToolUse") {
@@ -115,7 +129,11 @@ const journal: HookCallback = async (donnees) => {
   return {};
 };
 
-// ---------- 4. Les permissions : qui décide pour les outils qui ne sont pas autorisés d'office ----------
+// ---------- 4. Les permissions : qui décide pour les outils qui ne sont pas autorisés d'office (étapes 7 et 8) ----------
+
+// Pourquoi une fonction qui en fabrique une autre : la façon de demander l'accord dépend du programme
+// (une question au clavier dans terminal.ts, deux boutons dans interface.ts). L'agent ne change pas.
+// Pourquoi tout refuser à la fin : un outil qu'on n'a pas prévu ne doit jamais passer par défaut.
 
 export type DemanderAccord = (nomOutil: string, parametres: Record<string, unknown>) => Promise<boolean>;
 
@@ -132,6 +150,7 @@ function creerPermission(demanderAccord?: DemanderAccord): CanUseTool {
 
     // Read, l'outil intégré du SDK : seulement dans le dossier des procédures.
     if (nomOutil === "Read") {
+      // Pourquoi path.resolve : pour qu'un chemin comme ../../.env soit ramené à son vrai dossier avant le test.
       const chemin = path.resolve(PROCEDURES, String(parametres.file_path ?? ""));
       if (path.dirname(chemin) === PROCEDURES) {
         return { behavior: "allow", updatedInput: parametres };
@@ -143,7 +162,13 @@ function creerPermission(demanderAccord?: DemanderAccord): CanUseTool {
   };
 }
 
-// ---------- 5. Les options : tout ce qui décrit l'agent ----------
+// ---------- 5. Les options : tout ce qui décrit l'agent (étapes 3, 5, 6, 7 et 8) ----------
+
+// Pourquoi tools et allowedTools sont deux listes : tools dit quels outils intégrés existent pour le modèle,
+// allowedTools dit lesquels s'exécutent sans rien demander. L'outil d'action et Read n'y sont pas :
+// ils passent donc par canUseTool.
+// Pourquoi settingSources: [] : sans cela, le SDK charge les réglages de Claude Code s'il est installé
+// sur la machine, et l'agent ne se comporte plus de la même façon d'un poste à l'autre.
 
 export function creerOptions(sessionId?: string, demanderAccord?: DemanderAccord): Options {
   return {
