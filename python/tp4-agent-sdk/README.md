@@ -1,6 +1,6 @@
 # TP 4 — L'agent d'atelier avec l'Agent SDK
 
-**Durée : 1 h 35.** Jour 1, après le module 4.
+**Durée : 2 h.** Jour 1, après le module 4.
 
 ## Objectif
 
@@ -71,11 +71,18 @@ chainlit run exercice/interface.py
 
 Ouvrez http://localhost:8000 et refaites la même conversation. Lisez `exercice/interface.py` : c'est le même `query`, avec deux boutons à la place de la question du terminal.
 
-Si vous avez fini, au choix :
+## Partie 4 — À vous (25 min)
 
-- ajouter `max_budget_usd` dans `creer_options` et observer ce qui se passe avec un budget très bas ;
-- écrire un hook `PostToolUse` qui signale un résultat d'outil de plus de 2 000 caractères ;
-- ajouter un outil `lister_controles_qualite`, en reprenant celui du TP 3.
+Exploration libre : il n'y a pas de corrigé pour cette partie. Quelques pistes, au choix :
+
+- **Un troisième outil** : `lister_controles_qualite`, en reprenant celui du TP 3, puis demandez un bilan complet de la presse 4.
+- **Un second outil d'action**, par exemple annuler une demande d'intervention, lui aussi soumis à validation.
+- **Un hook `PostToolUse`** qui signale un résultat d'outil de plus de 2 000 caractères.
+- **Un budget** : ajoutez `max_budget_usd` avec un montant très bas et regardez comment l'agent s'arrête.
+- **Le niveau de raisonnement** : ajoutez `effort` (`"low"`, puis `"high"`) et comparez les réponses et le coût.
+- **Une relecture, comme au TP 3** : après la réponse, relancez `query` avec `resume` et une consigne de relecture.
+- **Un autre modèle** : changez `MODELE` dans le fichier `.env`.
+- **Le prompt système** : retirez une règle et cherchez la question qui met l'agent en défaut.
 
 ## Solution
 
