@@ -1,7 +1,7 @@
-// TP 5 : brancher des serveurs MCP sur l'agent d'atelier (à compléter).
+// TP 5 : brancher le serveur MCP « atelier » sur l'agent (à compléter).
 //
 // Ce fichier est l'agent du TP 4, terminé. Vous pouvez le remplacer par le vôtre.
-// Les parties 2 et 3 du TP se font ici : cherchez « TP 5 » et « À ÉCRIRE ».
+// Une fois votre serveur écrit et testé, cherchez ici « TP 5 » et « À ÉCRIRE ».
 //
 // Pour parler à l'agent, depuis le dossier du TP :
 //   npx tsx exercice/terminal.ts
@@ -27,8 +27,7 @@ const MODELE = process.env.MODELE ?? "";
 const DATA = "../../data";
 const PROCEDURES = path.resolve("procedures");
 const DEMANDES = path.resolve("demandes_intervention.json");
-const SERVEUR_MEMOIRE = path.resolve("serveur/memoire.ts");
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? "";
+const SERVEUR_ATELIER = path.resolve("exercice/serveur_atelier.ts");
 
 // ---------- 1. Le prompt système : rôle, contexte, règles, format (étape 4) ----------
 
@@ -120,29 +119,21 @@ const atelier = createSdkMcpServer({
 const OUTILS_DE_LECTURE = ["mcp__atelier__lister_arrets", "mcp__atelier__lire_ordre_fabrication"];
 const OUTIL_D_ACTION = "mcp__atelier__creer_demande_intervention";
 
-// ---------- TP 5 : brancher des serveurs MCP externes ----------
+// ---------- TP 5 : brancher le serveur MCP « atelier » ----------
 
 // Un serveur MCP externe ne se déclare pas avec tool() : c'est un programme à part.
-// On dit seulement au SDK comment le joindre, dans mcpServers. Le SDK lui demande ses outils.
+// On dit seulement au SDK comment le lancer, dans mcpServers. Le SDK lui demande ses outils.
 
-// Partie 2. Brancher notre serveur « memoire » (transport stdio : le SDK lance le programme).
-//   Dans creerOptions, ajouter à mcpServers :
-//       memoire: { command: process.execPath, args: ["--import", "tsx", SERVEUR_MEMOIRE] }
-//   Autoriser ses deux outils : "mcp__memoire__lire_memoire" et "mcp__memoire__memoriser".
-//   Ajouter au prompt système quand consulter la mémoire, et quand y écrire.
+// Étape 4. Retirer d'ici ce qui a déménagé dans le serveur.
+//   - Supprimer listerArrets et lireOrdreFabrication, plus haut.
+//   - Le serveur interne ne garde que creerDemandeIntervention. Le renommer « actions »
+//     (le nom « atelier » est pris par le serveur externe), et corriger OUTIL_D_ACTION.
 
-// Partie 3. Brancher le serveur officiel de GitHub (transport HTTP : le serveur tourne chez GitHub).
+// Étape 5. Brancher votre serveur (transport stdio : le SDK lance le programme).
 //   Dans creerOptions, ajouter à mcpServers :
-//       github: {
-//         type: "http",
-//         url: "https://api.githubcopilot.com/mcp/",
-//         headers: {
-//           Authorization: `Bearer ${GITHUB_TOKEN}`,   // le jeton, lu dans le fichier .env
-//           "X-MCP-Toolsets": "repos",                 // seulement les outils sur les dépôts
-//           "X-MCP-Readonly": "true",                  // seulement les outils de lecture
-//         },
-//       }
-//   Autoriser ses outils : "mcp__github__*".
+//       atelier: { command: process.execPath, args: ["--import", "tsx", SERVEUR_ATELIER] }
+//   OUTILS_DE_LECTURE ne change pas : les outils s'appellent toujours mcp__atelier__...
+//   Si vous avez fait le bonus, ajoutez-y les deux nouveaux outils.
 
 // ---------- 3. La trace : un hook appelé avant chaque outil (étape 6) ----------
 
@@ -197,13 +188,13 @@ function creerPermission(demanderAccord?: DemanderAccord): CanUseTool {
 // Pourquoi settingSources: [] : sans cela, le SDK charge les réglages de Claude Code s'il est installé
 // sur la machine, et l'agent ne se comporte plus de la même façon d'un poste à l'autre.
 
-export function creerOptions(sessionId?: string, demanderAccord?: DemanderAccord, utilisateur?: string): Options {
+export function creerOptions(sessionId?: string, demanderAccord?: DemanderAccord): Options {
   return {
     model: MODELE,
-    systemPrompt: `${SYSTEME} Tu parles avec ${utilisateur || "un utilisateur inconnu"}.`,
-    mcpServers: { atelier }, // nos outils. À ÉCRIRE : ajouter ici les serveurs memoire, puis github
+    systemPrompt: SYSTEME,
+    mcpServers: { atelier }, // nos outils. À ÉCRIRE : le serveur externe « atelier », et le serveur interne « actions »
     tools: ["Read"], // le seul outil intégré du SDK qu'on garde : lire un fichier
-    allowedTools: OUTILS_DE_LECTURE, // ce qui s'exécute sans rien demander. À ÉCRIRE : y ajouter les outils des serveurs
+    allowedTools: OUTILS_DE_LECTURE, // ce qui s'exécute sans rien demander
     canUseTool: creerPermission(demanderAccord), // tout le reste passe par cette fonction
     hooks: { PreToolUse: [{ hooks: [journal] }] }, // la trace
     maxTurns: 10, // la limite de tours

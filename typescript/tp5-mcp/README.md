@@ -1,12 +1,14 @@
-# TP 5 — Brancher des serveurs MCP
+# TP 5 — Écrire un serveur MCP et le brancher
 
 **Durée : 40 min.** Jour 2, après le module 1.
 
 ## Objectif
 
-- Lire un serveur MCP écrit à la main, et voir ce qu'il annonce à un client.
-- Le brancher sur l'agent d'hier : une mémoire commune à toutes les conversations.
-- Brancher un serveur MCP officiel, à distance, avec une authentification : celui de GitHub.
+- Lire un serveur MCP, *Mémoire*, et voir ce qu'il annonce à un client.
+- Écrire le vôtre : le serveur « atelier », avec les outils de lecture de l'agent d'hier.
+- Le brancher sur l'agent, à la place de ses outils internes.
+
+Ce serveur resservira cet après-midi : plusieurs agents s'y brancheront.
 
 ## Installation
 
@@ -23,62 +25,62 @@ Toutes les commandes se lancent depuis ce dossier.
 
 | Fichier | Ce qu'il fait |
 |---|---|
-| `serveur/memoire.ts` | Un serveur MCP écrit par nous : la mémoire commune de l'atelier. À lire, pas à modifier. |
-| `exercice/decouvrir.ts` | Un client MCP minimal : il demande à un serveur la liste de ses outils. Fourni. |
+| `exemple/memoire.ts` | *Mémoire*, le serveur MCP du cours. À lire : c'est le modèle à suivre. |
+| `exercice/decouvrir.ts` | Un client MCP minimal : il interroge un serveur, sans agent ni modèle. Fourni. |
+| `exercice/serveur_atelier.ts` | **À écrire.** Votre serveur MCP. |
 | `exercice/agent.ts` | **À compléter.** L'agent du TP 4, terminé. Vous pouvez y mettre le vôtre. |
 | `exercice/terminal.ts` | Une conversation dans le terminal. Fourni. |
 
-## Partie 1 — Un serveur MCP, vu de près (10 min)
+## Partie 1 — Un serveur MCP, vu de près (5 min)
 
-1. Ouvrez `serveur/memoire.ts`. Trois choses à repérer : la création du serveur, la déclaration des deux outils, le lancement.
-2. Interrogez-le, sans agent ni modèle :
+1. Ouvrez `exemple/memoire.ts`. Trois choses à repérer : la création du serveur, la déclaration des deux outils, le lancement.
+2. Interrogez-le, puis appelez un de ses outils :
 
    ```bash
-   npx tsx exercice/decouvrir.ts memoire
+   npx tsx exercice/decouvrir.ts exemple/memoire.ts
+   npx tsx exercice/decouvrir.ts exemple/memoire.ts memoriser auteur=Moi "note=Premier essai."
    ```
 
-   Le client lance le serveur, ouvre une session et lui demande ses outils. Ce que vous voyez est exactement ce qu'un agent recevra.
+   Le client lance le serveur, fait la poignée de main, demande la liste des outils, puis en appelle un. Ce sont les trois demandes du protocole : `initialize`, `tools/list`, `tools/call`.
 
-Comparez avec la déclaration d'un outil dans `exercice/agent.ts` : qu'est-ce qui est pareil, qu'est-ce qui change ?
+## Partie 2 — Écrire le serveur « atelier » (20 min)
 
-## Partie 2 — Brancher notre serveur sur l'agent (15 min)
+Dans `exercice/serveur_atelier.ts`, suivez les étapes 1 à 3 :
+
+1. Créer le serveur, nommé `atelier`.
+2. Y déclarer `lister_arrets` et `lire_ordre_fabrication`. Leur code est dans `exercice/agent.ts` : reprenez-le, avec les mêmes noms et les mêmes descriptions.
+3. Lancer le serveur.
+
+Testez-le sans agent, autant de fois que nécessaire :
+
+```bash
+npx tsx exercice/decouvrir.ts exercice/serveur_atelier.ts
+npx tsx exercice/decouvrir.ts exercice/serveur_atelier.ts lister_arrets machine_id=P4
+npx tsx exercice/decouvrir.ts exercice/serveur_atelier.ts lire_ordre_fabrication of_id=OF-9999
+```
+
+Le dernier appel doit revenir marqué « ERREUR », avec un message lisible.
+
+## Partie 3 — Le brancher sur l'agent (15 min)
 
 Dans `exercice/agent.ts`, section « TP 5 » :
 
-1. Ajoutez le serveur `memoire` à `mcpServers` : une commande et ses arguments.
-2. Autorisez ses deux outils dans `allowedTools` : `mcp__memoire__lire_memoire` et `mcp__memoire__memoriser`.
-3. Dites à l'agent, dans le prompt système, quand consulter la mémoire et quand y écrire.
-
-Testez sur **deux conversations séparées** : chaque lancement du terminal en démarre une neuve.
+4. Retirez de l'agent les deux outils qui ont déménagé. Le serveur interne ne garde que l'action : renommez-le `actions`.
+5. Ajoutez votre serveur à `mcpServers` : la commande qui le lance.
 
 ```bash
 npx tsx exercice/terminal.ts
 ```
 
-- Première conversation : « Retiens que la presse 4 doit être graissée tous les lundis matin avant le démarrage. » Puis quittez.
-- Seconde conversation : « Y a-t-il une consigne particulière pour la presse 4 ? »
+- « Que s'est-il passé sur la presse 4 ce matin, et où en est l'ordre de fabrication concerné ? »
+- « Crée une demande d'intervention pour l'éjecteur de la presse 4. »
 
-Ouvrez ensuite `memoire.json` : c'est tout ce que le serveur a gardé. Quelle différence avec `resume`, vu hier ?
+Regardez le journal : les outils de lecture portent le même nom qu'hier. Qu'est-ce qui a changé, et pour qui ?
 
-## Partie 3 — Brancher un serveur officiel : GitHub (15 min)
+## Bonus
 
-Le serveur MCP de GitHub tourne chez GitHub. Il agit en votre nom : il lui faut un jeton.
-
-1. Créez un jeton sur GitHub : *Settings › Developer settings › Personal access tokens › Fine-grained tokens › Generate new token*. Accès aux dépôts : **Public repositories (read-only)**. Aucune autre permission.
-2. Collez-le dans le fichier `.env`, à la racine du dépôt, sur la ligne `GITHUB_TOKEN=`.
-3. Regardez ce que le serveur annonce, d'abord sans filtre, puis limité aux dépôts en lecture seule :
-
-   ```bash
-   npx tsx exercice/decouvrir.ts github
-   npx tsx exercice/decouvrir.ts github repos
-   ```
-
-   Comparez le nombre d'outils et le nombre de tokens. Tout cela serait renvoyé au modèle à chaque tour.
-4. Dans `exercice/agent.ts`, ajoutez le serveur `github` à `mcpServers` (type `http`, l'adresse, les trois en-têtes) et autorisez `mcp__github__*`.
-5. Demandez à l'agent : « Quels dossiers contient le dépôt leoweb57/HC-agents-IA sur GitHub ? »
-
-Un jeton est un secret : il reste dans `.env`, jamais dans le code, et vous pouvez le supprimer sur GitHub à la fin de la formation.
+Ajoutez au serveur `lister_controles_qualite` et `historique_arrets` (les consignes sont dans le fichier), autorisez-les dans l'agent, puis demandez : « Cet arrêt est-il déjà arrivé depuis début mars, et les contrôles qualité de l'ordre de fabrication sont-ils bons ? »
 
 ## Solution
 
-`solution/agent.ts` est le fichier `exercice/agent.ts` une fois les parties 2 et 3 terminées. Ses commentaires « Pourquoi » expliquent les choix. Pour le voir tourner, copiez-le à la place de `exercice/agent.ts`.
+`solution/serveur_atelier.ts` et `solution/agent.ts` sont les deux fichiers de l'exercice une fois terminés, bonus compris. Leurs commentaires « Pourquoi » expliquent les choix. Pour les voir tourner, copiez-les à la place de ceux du dossier `exercice/`.

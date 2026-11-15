@@ -1,6 +1,6 @@
-// TP 5 : brancher des serveurs MCP sur l'agent d'atelier (solution).
+// TP 5 : brancher le serveur MCP « atelier » sur l'agent (solution).
 //
-// C'est le fichier exercice/agent.ts une fois les parties 2 et 3 terminées.
+// C'est le fichier exercice/agent.ts une fois terminé.
 // Les commentaires « Pourquoi » de la section TP 5 expliquent les choix.
 //
 // Pour le voir tourner, copiez-le à la place de exercice/agent.ts, puis lancez exercice/terminal.ts.
@@ -23,11 +23,9 @@ process.loadEnvFile("../../.env"); // lit le fichier .env à la racine du dépô
 process.removeAllListeners("warning");
 
 const MODELE = process.env.MODELE ?? "";
-const DATA = "../../data";
 const PROCEDURES = path.resolve("procedures");
 const DEMANDES = path.resolve("demandes_intervention.json");
-const SERVEUR_MEMOIRE = path.resolve("serveur/memoire.ts");
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? "";
+const SERVEUR_ATELIER = path.resolve("exercice/serveur_atelier.ts");
 
 // ---------- 1. Le prompt système : rôle, contexte, règles, format (étape 4) ----------
 
@@ -46,52 +44,17 @@ const SYSTEME =
   // Les règles
   "Réponds uniquement à partir des résultats des outils. Si une donnée manque, dis-le. " +
   "Ne crée une demande d'intervention que si on te le demande explicitement. " +
-  // La mémoire commune (TP 5). Pourquoi le dire ici : le modèle voit les outils du serveur,
-  // mais c'est le prompt système qui lui dit quand s'en servir.
-  "Tu as une mémoire commune à toutes les conversations. Consulte-la avec lire_memoire avant de répondre " +
-  "à une question sur une consigne ou une habitude de l'atelier. Quand on te demande de retenir quelque chose, " +
-  "enregistre-le avec memoriser, avec le prénom de l'utilisateur comme auteur. " +
   // Le format
   "Réponds en français, en trois phrases au plus.";
 
-// ---------- 2. Les outils de l'atelier (étapes 1, 2 et 7) ----------
-
-// Pourquoi les descriptions sont aussi détaillées : c'est tout ce que le modèle voit d'un outil.
-// La correspondance « presse 4 = P4 » est écrite dans la description du paramètre (énigme 1 du TP 2).
+// ---------- 2. L'outil d'action de l'agent (étape 7) ----------
 
 type Enregistrement = Record<string, unknown>;
-
-function charger(fichier: string): Enregistrement[] {
-  return JSON.parse(readFileSync(`${DATA}/${fichier}`, "utf-8"));
-}
 
 /** Met des données au format attendu par le SDK pour un résultat d'outil. */
 function resultat(donnees: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(donnees) }] };
 }
-
-const listerArrets = tool(
-  "lister_arrets",
-  "Liste les arrêts d'une machine de l'atelier sur la semaine en cours : date, durée, cause et ordre de fabrication concerné.",
-  {
-    machine_id: z
-      .string()
-      .describe(
-        "Identifiant de la machine : P1 à P4 pour les presses 1 à 4, A1 pour la ligne d'assemblage, C1 pour la cellule de contrôle.",
-      ),
-  },
-  async (args) => resultat(charger("arrets_machine.json").filter((arret) => arret.machine_id === args.machine_id)),
-);
-
-const lireOrdreFabrication = tool(
-  "lire_ordre_fabrication",
-  "Renvoie le détail d'un ordre de fabrication : article, machine, quantités prévue et produite, statut, dates.",
-  { of_id: z.string().describe("Identifiant de l'ordre de fabrication, par exemple OF-2231.") },
-  async (args) => {
-    const ordre = charger("ordres_fabrication.json").find((o) => o.id === args.of_id);
-    return resultat(ordre ?? { erreur: `Aucun ordre de fabrication ${args.of_id}.` });
-  },
-);
 
 // Un outil d'action : il écrit. Il ne s'exécute qu'après l'accord d'une personne (voir plus bas).
 // Pourquoi il est déclaré comme les autres : pour le SDK, lecture ou action, c'est le même objet.
@@ -113,48 +76,30 @@ const creerDemandeIntervention = tool(
   },
 );
 
-// Les outils sont regroupés dans un serveur interne au programme.
-// Leur nom complet devient : mcp__atelier__lister_arrets, etc.
-const atelier = createSdkMcpServer({
-  name: "atelier",
-  version: "1.0.0",
-  tools: [listerArrets, lireOrdreFabrication, creerDemandeIntervention],
-});
+// Pourquoi un serveur interne reste : l'action est propre à cet agent, et elle passe par l'accord
+// d'une personne. Elle reste donc dans son code. Pourquoi « actions » : le nom « atelier » est
+// maintenant celui du serveur externe, et deux serveurs ne peuvent pas porter le même nom.
+const actions = createSdkMcpServer({ name: "actions", version: "1.0.0", tools: [creerDemandeIntervention] });
 
-const OUTILS_DE_LECTURE = ["mcp__atelier__lister_arrets", "mcp__atelier__lire_ordre_fabrication"];
-const OUTIL_D_ACTION = "mcp__atelier__creer_demande_intervention";
+// Pourquoi ces noms n'ont pas bougé : le préfixe est le nom du serveur, et il s'appelle toujours « atelier ».
+// Le code a déménagé, le modèle ne voit aucune différence.
+const OUTILS_DE_LECTURE = [
+  "mcp__atelier__lister_arrets",
+  "mcp__atelier__lire_ordre_fabrication",
+  "mcp__atelier__lister_controles_qualite", // bonus
+  "mcp__atelier__historique_arrets", // bonus
+];
+const OUTIL_D_ACTION = "mcp__actions__creer_demande_intervention";
 
-// ---------- TP 5 : les serveurs MCP externes (parties 2 et 3) ----------
+// ---------- TP 5 : le serveur MCP « atelier » ----------
 
-// Pourquoi pas de tool() ici : un serveur MCP externe est un programme à part. On dit seulement au SDK
-// comment le joindre ; c'est le serveur qui annonce ses outils, leurs descriptions et leurs schémas.
-
-// Notre serveur « memoire », en transport stdio.
-// Pourquoi une commande : le SDK lance lui-même le programme et lui parle par son entrée et sa sortie standard.
-// Pourquoi process.execPath et --import tsx : pour lancer le fichier TypeScript avec le même Node que l'agent.
-const SERVEURS_EXTERNES: NonNullable<Options["mcpServers"]> = {
-  memoire: { command: process.execPath, args: ["--import", "tsx", SERVEUR_MEMOIRE] },
-};
-// Pourquoi memoriser est autorisé d'office alors qu'il écrit : c'est notre code, on sait ce qu'il fait,
-// et une note en trop se supprime. Pour un serveur écrit par un tiers, on aurait demandé un accord.
-const OUTILS_MCP = ["mcp__memoire__lire_memoire", "mcp__memoire__memoriser"];
-
-// Le serveur officiel de GitHub, en transport HTTP : il tourne chez GitHub, rien n'est lancé sur ce poste.
-// Pourquoi un jeton : le serveur agit en votre nom sur GitHub. Le jeton reste dans .env, jamais dans le code.
-// Pourquoi les deux en-têtes X-MCP : sans eux, le serveur annonce tous ses outils, écriture comprise.
-// On ne garde que les outils sur les dépôts, en lecture seule : moins de contexte, et aucun risque d'écriture.
-if (GITHUB_TOKEN && !GITHUB_TOKEN.includes("mettre-votre")) {
-  SERVEURS_EXTERNES.github = {
-    type: "http",
-    url: "https://api.githubcopilot.com/mcp/",
-    headers: {
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-      "X-MCP-Toolsets": "repos",
-      "X-MCP-Readonly": "true",
-    },
-  };
-  OUTILS_MCP.push("mcp__github__*"); // tous ses outils : le serveur ne propose plus que de la lecture
-}
+// Pourquoi pas de tool() pour les lectures : elles vivent maintenant dans un programme à part,
+// serveur_atelier.ts. On dit seulement au SDK comment le lancer ; c'est le serveur qui annonce
+// ses outils, leurs descriptions et leurs schémas.
+// Pourquoi une commande : en transport stdio, le SDK lance lui-même le programme au démarrage de l'agent,
+// et lui parle par son entrée et sa sortie standard. Rien à lancer à la main.
+// Pourquoi process.execPath et tsx : pour le lancer avec le même Node que l'agent, en TypeScript.
+const SERVEUR_EXTERNE = { command: process.execPath, args: ["--import", "tsx", SERVEUR_ATELIER] };
 
 // ---------- 3. La trace : un hook appelé avant chaque outil (étape 6) ----------
 
@@ -209,13 +154,13 @@ function creerPermission(demanderAccord?: DemanderAccord): CanUseTool {
 // Pourquoi settingSources: [] : sans cela, le SDK charge les réglages de Claude Code s'il est installé
 // sur la machine, et l'agent ne se comporte plus de la même façon d'un poste à l'autre.
 
-export function creerOptions(sessionId?: string, demanderAccord?: DemanderAccord, utilisateur?: string): Options {
+export function creerOptions(sessionId?: string, demanderAccord?: DemanderAccord): Options {
   return {
     model: MODELE,
-    systemPrompt: `${SYSTEME} Tu parles avec ${utilisateur || "un utilisateur inconnu"}.`,
-    mcpServers: { atelier, ...SERVEURS_EXTERNES }, // nos outils, et les serveurs externes
+    systemPrompt: SYSTEME,
+    mcpServers: { atelier: SERVEUR_EXTERNE, actions }, // le serveur externe, et notre action
     tools: ["Read"], // le seul outil intégré du SDK qu'on garde : lire un fichier
-    allowedTools: [...OUTILS_DE_LECTURE, ...OUTILS_MCP], // ce qui s'exécute sans rien demander
+    allowedTools: OUTILS_DE_LECTURE, // ce qui s'exécute sans rien demander
     canUseTool: creerPermission(demanderAccord), // tout le reste passe par cette fonction
     hooks: { PreToolUse: [{ hooks: [journal] }] }, // la trace
     maxTurns: 10, // la limite de tours
