@@ -7,6 +7,7 @@ Chaque TP existe en **Python** et en **TypeScript** : choisissez votre langage.
 
 ```
 .env           Votre clé API et le nom du modèle, lus par tous les TP
+langfuse.env   Les réglages du Langfuse local du jour 3 (voir le TP 10)
 data/          Données fictives de l'atelier, communes aux deux langages
 python/        Les TP en Python
 typescript/    Les TP en TypeScript
@@ -19,6 +20,8 @@ Chaque TP a son dossier numéroté, avec :
 - `solution/` : une solution possible, à ouvrir quand vous le décidez
 
 Chaque TP repart d'une page blanche. Pour réutiliser votre code d'un TP précédent, copiez-le depuis son dossier.
+
+Les TP 8 à 12 (jour 3) sont du code complet, sans dossier `exercice/` : on le lance, on le lit, on regarde ce qu'il mesure.
 
 Le dépôt est en lecture seule : clonez-le et travaillez en local.
 

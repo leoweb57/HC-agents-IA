@@ -1,0 +1,4 @@
+claude-agent-sdk
+mcp>=2
+python-dotenv
+langfuse>=5

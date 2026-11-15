@@ -1,0 +1,41 @@
+[
+  {
+    "id": "avancement-of-2231",
+    "question": "Où en est l'OF-2231 ?",
+    "points_attendus": [
+      "L'OF-2231 est en cours",
+      "1 740 pièces produites sur 3 000 prévues",
+      "Signale l'arrêt de 74 minutes de ce matin sur la presse 4"
+    ],
+    "outils_attendus": [
+      "lire_ordre_fabrication"
+    ],
+    "source": "retour utilisateur"
+  },
+  {
+    "id": "avancement-of-2234",
+    "question": "Où en est l'OF-2234 ?",
+    "points_attendus": [
+      "L'OF-2234 est en cours",
+      "640 pièces produites sur 1 200 prévues",
+      "Signale l'arrêt de 15 minutes de ce matin, en attente de composants"
+    ],
+    "outils_attendus": [
+      "lire_ordre_fabrication"
+    ],
+    "source": "retour utilisateur"
+  },
+  {
+    "id": "avancement-of-2232-termine",
+    "question": "Où en est l'OF-2232 ?",
+    "points_attendus": [
+      "L'OF-2232 est terminé",
+      "1 800 pièces produites sur 1 800 prévues",
+      "Indique qu'il n'y a pas eu d'arrêt aujourd'hui sur la presse 2"
+    ],
+    "outils_attendus": [
+      "lire_ordre_fabrication"
+    ],
+    "source": "retour utilisateur"
+  }
+]

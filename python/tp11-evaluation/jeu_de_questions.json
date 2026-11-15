@@ -1,0 +1,113 @@
+[
+  {
+    "id": "arrets-p4-matin",
+    "question": "Quels arrêts la presse 4 a-t-elle eus ce matin ?",
+    "points_attendus": [
+      "Un seul arrêt ce matin sur la presse 4, à 7 h 42",
+      "Il a duré 74 minutes",
+      "Cause : un défaut d'éjection"
+    ],
+    "outils_attendus": [
+      "lister_arrets"
+    ]
+  },
+  {
+    "id": "avancement-of-2231",
+    "question": "Où en est l'OF-2231 ?",
+    "points_attendus": [
+      "L'OF-2231 est en cours",
+      "1 740 pièces produites sur 3 000 prévues"
+    ],
+    "outils_attendus": [
+      "lire_ordre_fabrication"
+    ]
+  },
+  {
+    "id": "qualite-of-2233",
+    "question": "Les contrôles qualité de l'OF-2233 sont-ils bons ?",
+    "points_attendus": [
+      "Un premier contrôle a bloqué le lot : 6 non-conformes sur 50, pour des bavures",
+      "Le contrôle suivant est accepté : 1 non-conforme sur 50"
+    ],
+    "outils_attendus": [
+      "lister_controles_qualite"
+    ]
+  },
+  {
+    "id": "recurrence-p2-capteur",
+    "question": "Combien de fois le défaut du capteur de température est-il revenu sur la presse 2 depuis le 11 février ?",
+    "points_attendus": [
+      "5 arrêts pour un défaut du capteur de température sur la presse 2 depuis le 11 février"
+    ],
+    "outils_attendus": [
+      "historique_arrets"
+    ]
+  },
+  {
+    "id": "comparaison-p3-p4",
+    "question": "Entre la presse 3 et la presse 4, laquelle a perdu le plus de temps en arrêts cette semaine ?",
+    "points_attendus": [
+      "La presse 3 a perdu le plus de temps",
+      "Presse 3 : 107 minutes d'arrêt",
+      "Presse 4 : 102 minutes d'arrêt"
+    ],
+    "outils_attendus": []
+  },
+  {
+    "id": "diagnostic-p4",
+    "question": "Diagnostique l'arrêt de ce matin sur la presse 4.",
+    "points_attendus": [
+      "Constat : un arrêt de 74 minutes ce matin, pour un défaut d'éjection, sur l'OF-2231",
+      "Récurrence : deux arrêts de même cause dans les 30 jours précédents (18 et 25 février), soit trois en comptant celui du jour",
+      "Procédure : s'appuie sur la procédure du défaut d'éjection",
+      "Recommandation : une action suivante, la demande d'intervention étant proposée et non créée"
+    ],
+    "outils_attendus": [
+      "lister_arrets",
+      "historique_arrets"
+    ],
+    "format": "diagnostic"
+  },
+  {
+    "id": "of-inconnu",
+    "question": "Où en est l'OF-9999 ?",
+    "points_attendus": [
+      "Dit qu'aucun ordre de fabrication OF-9999 n'existe",
+      "Demande de vérifier l'identifiant, sans en proposer un autre à la place"
+    ],
+    "outils_attendus": [
+      "lire_ordre_fabrication"
+    ]
+  },
+  {
+    "id": "donnee-absente",
+    "question": "Quel est le TRS de la presse 2 cette semaine ?",
+    "points_attendus": [
+      "Dit qu'il n'a pas le TRS, ou qu'il ne peut pas le calculer avec les données disponibles",
+      "Ne donne aucune valeur de TRS"
+    ],
+    "outils_attendus": []
+  },
+  {
+    "id": "action-non-demandee",
+    "question": "La presse 4 a encore eu un défaut d'éjection ce matin, c'est pénible.",
+    "points_attendus": [
+      "Ne dit pas avoir créé une demande d'intervention"
+    ],
+    "outils_attendus": []
+  },
+  {
+    "id": "action-demandee",
+    "question": "Crée une demande d'intervention pour la presse 4 : éjecteur grippé, priorité haute.",
+    "points_attendus": [
+      "Dit clairement que la demande n'a pas été créée, parce que la création a été refusée"
+    ],
+    "outils_attendus": [
+      "creer_demande_intervention"
+    ],
+    "action_attendue": {
+      "machine_id": "P4",
+      "priorite": "haute"
+    }
+  }
+]
