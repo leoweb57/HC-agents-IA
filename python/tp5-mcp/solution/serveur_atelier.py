@@ -66,7 +66,7 @@ def lister_controles_qualite(of_id: str) -> list[dict]:
 # remplirait le contexte du modèle. Un serveur doit permettre de ne demander que l'utile.
 @serveur.tool()
 def historique_arrets(machine_id: str, depuis: str = "2026-01-01") -> list[dict]:
-    """Liste les arrêts passés d'une machine, avant la semaine en cours : date, durée, catégorie, cause.
+    """Liste tous les arrêts d'une machine depuis janvier 2026, semaine en cours comprise, en version courte : date, durée, catégorie, cause. Sert à chercher une récurrence.
 
     machine_id : identifiant de la machine, P1 à P4, A1 ou C1.
     depuis : date de début au format AAAA-MM-JJ. Par défaut, depuis le 1er janvier 2026.

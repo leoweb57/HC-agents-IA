@@ -27,7 +27,7 @@ const MODELE = process.env.MODELE ?? "";
 const TP = path.resolve(".");
 const SKILL = path.resolve(".claude/skills/diagnostic-arret");
 const DEMANDES = path.resolve("demandes_intervention.json");
-const SERVEUR_ATELIER = path.resolve("serveur_atelier.ts");
+const SERVEUR_ATELIER = path.resolve("exercice/serveur_atelier.ts");
 
 // ---------- 1. Le prompt système : rôle, contexte, règles, format (étape 4) ----------
 

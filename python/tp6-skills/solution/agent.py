@@ -35,7 +35,7 @@ MODELE = os.environ["MODELE"]
 TP = Path(__file__).resolve().parents[1]
 SKILL = TP / ".claude" / "skills" / "diagnostic-arret"
 DEMANDES = TP / "demandes_intervention.json"
-SERVEUR_ATELIER = TP / "serveur_atelier.py"
+SERVEUR_ATELIER = TP / "exercice" / "serveur_atelier.py"
 
 
 # ---------- 1. Le prompt système : rôle, contexte, règles, format (étape 4) ----------

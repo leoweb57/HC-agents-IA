@@ -28,6 +28,10 @@ async def main():
             if isinstance(message, ResultMessage):
                 session_id = message.session_id  # on garde l'identifiant pour le message suivant
                 print(f"\nAgent : {message.result}")
+                # Ce que le modèle a lu pour répondre, tous tours confondus : de quoi repérer un outil trop bavard.
+                usage = message.usage or {}
+                lus = sum(usage.get(cle) or 0 for cle in ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"))
+                print(f"  [{message.num_turns} tours, {lus} tokens lus par le modèle]")
 
 
 asyncio.run(main())

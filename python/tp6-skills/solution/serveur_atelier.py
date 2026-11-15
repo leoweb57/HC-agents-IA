@@ -1,7 +1,9 @@
-"""TP 6 : le serveur MCP « atelier ». Fourni : c'est celui du TP 5, terminé.
+"""TP 6 : le serveur MCP « atelier », corrigé (solution).
 
-Il propose quatre outils de lecture : lister_arrets, lire_ordre_fabrication,
-lister_controles_qualite et historique_arrets.
+C'est le fichier exercice/serveur_atelier.py une fois ses trois défauts corrigés.
+Les commentaires « Correction » disent ce qui a changé, et pourquoi.
+
+Pour le voir tourner, copiez-le à la place de exercice/serveur_atelier.py.
 """
 
 import json
@@ -10,7 +12,7 @@ from pathlib import Path
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 
-DATA = Path(__file__).resolve().parents[2] / "data"
+DATA = Path(__file__).resolve().parents[3] / "data"
 
 
 def charger(fichier: str) -> list[dict]:
@@ -22,21 +24,22 @@ def charger(fichier: str) -> list[dict]:
 serveur = MCPServer("atelier")
 
 
-# Pourquoi les mêmes noms et les mêmes descriptions qu'hier : pour le modèle, rien ne doit changer.
-# L'outil s'appelait mcp__atelier__lister_arrets dans l'agent, il s'appelle toujours ainsi :
-# « atelier » est maintenant le nom du serveur externe.
+# Correction 1, le mauvais aiguillage. Deux outils parlaient d'« arrêts » sans dire lesquels :
+# le modèle choisissait au hasard. Chaque description dit maintenant ce que l'outil couvre
+# (le détail de la semaine en cours ici, tout l'historique en version courte pour historique_arrets) et renvoie vers l'autre.
 @serveur.tool()
 def lister_arrets(machine_id: str) -> list[dict]:
-    """Liste les arrêts d'une machine de l'atelier sur la semaine en cours : date, durée, cause et ordre de fabrication concerné.
+    """Liste les arrêts d'une machine sur la semaine en cours, avec le détail : date, durée, cause, commentaire et ordre de fabrication concerné. Pour chercher une récurrence sur une période plus longue, utiliser historique_arrets.
 
     machine_id : identifiant de la machine. P1 à P4 pour les presses 1 à 4, A1 pour la ligne d'assemblage, C1 pour la cellule de contrôle.
     """
     return [arret for arret in charger("arrets_machine.json") if arret["machine_id"] == machine_id]
 
 
-# Pourquoi lever une erreur plutôt que renvoyer {"erreur": ...} comme hier : le protocole a un champ
-# prévu pour cela. La bibliothèque transforme l'exception en résultat marqué « isError », avec le message.
-# Le modèle le lit et peut se corriger ; le harnais, lui, sait que l'appel a échoué.
+# Correction 2, l'erreur silencieuse. Pour un identifiant inconnu, l'outil renvoyait une fiche vide :
+# le modèle la prenait pour une vraie réponse. Il lève maintenant une erreur : la bibliothèque en fait
+# un résultat marqué « isError », avec un message qui dit quoi faire. C'est une erreur métier
+# (la demande est bien formée, mais l'objet n'existe pas) : le modèle doit la dire, pas réessayer.
 @serveur.tool()
 def lire_ordre_fabrication(of_id: str) -> dict:
     """Renvoie le détail d'un ordre de fabrication : article, machine, quantités prévue et produite, statut, dates.
@@ -46,10 +49,8 @@ def lire_ordre_fabrication(of_id: str) -> dict:
     for ordre in charger("ordres_fabrication.json"):
         if ordre["id"] == of_id:
             return ordre
-    raise ToolError(f"Aucun ordre de fabrication {of_id}.")
+    raise ToolError(f"Aucun ordre de fabrication {of_id}. Vérifier l'identifiant auprès de l'utilisateur, sans en deviner un autre.")
 
-
-# ---------- Bonus : deux outils dont les agents de l'après-midi auront besoin ----------
 
 @serveur.tool()
 def lister_controles_qualite(of_id: str) -> list[dict]:
@@ -60,11 +61,12 @@ def lister_controles_qualite(of_id: str) -> list[dict]:
     return [controle for controle in charger("controles_qualite.json") if controle["of_id"] == of_id]
 
 
-# Pourquoi un paramètre « depuis » : l'historique compte plusieurs centaines d'arrêts. Tout renvoyer
-# remplirait le contexte du modèle. Un serveur doit permettre de ne demander que l'utile.
+# Correction 3, la sortie trop grosse. L'outil renvoyait tout l'historique de la machine, avec tous
+# les champs. Il filtre maintenant à partir d'une date, et ne garde que quatre champs utiles.
+# Ce que l'outil renvoie reste dans le contexte jusqu'à la fin de la conversation.
 @serveur.tool()
 def historique_arrets(machine_id: str, depuis: str = "2026-01-01") -> list[dict]:
-    """Liste les arrêts passés d'une machine, avant la semaine en cours : date, durée, catégorie, cause.
+    """Liste tous les arrêts d'une machine depuis janvier 2026, semaine en cours comprise, en version courte : date, durée, catégorie, cause. Sert à chercher une récurrence.
 
     machine_id : identifiant de la machine, P1 à P4, A1 ou C1.
     depuis : date de début au format AAAA-MM-JJ. Par défaut, depuis le 1er janvier 2026.

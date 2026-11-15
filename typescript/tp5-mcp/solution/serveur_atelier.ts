@@ -80,7 +80,7 @@ serveur.registerTool(
 serveur.registerTool(
   "historique_arrets",
   {
-    description: "Liste les arrêts passés d'une machine, avant la semaine en cours : date, durée, catégorie, cause.",
+    description: "Liste tous les arrêts d'une machine depuis janvier 2026, semaine en cours comprise, en version courte : date, durée, catégorie, cause. Sert à chercher une récurrence.",
     inputSchema: {
       machine_id: z.string().describe("Identifiant de la machine, P1 à P4, A1 ou C1."),
       depuis: z

@@ -25,6 +25,10 @@ while (true) {
     if (message.type === "result") {
       sessionId = message.session_id; // on garde l'identifiant pour le message suivant
       console.log(`\nAgent : ${message.subtype === "success" ? message.result : "Je n'ai pas pu répondre."}`);
+      // Ce que le modèle a lu pour répondre, tous tours confondus : de quoi repérer un outil trop bavard.
+      const u = message.usage;
+      const lus = (u.input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0);
+      console.log(`  [${message.num_turns} tours, ${lus} tokens lus par le modèle]`);
     }
   }
 }

@@ -1,7 +1,9 @@
-// TP 6 : le serveur MCP « atelier ». Fourni : c'est celui du TP 5, terminé.
+// TP 6 : le serveur MCP « atelier », corrigé (solution).
 //
-// Il propose quatre outils de lecture : lister_arrets, lire_ordre_fabrication,
-// lister_controles_qualite et historique_arrets.
+// C'est le fichier exercice/serveur_atelier.ts une fois ses trois défauts corrigés.
+// Les commentaires « Correction » disent ce qui a changé, et pourquoi.
+//
+// Pour le voir tourner, copiez-le à la place de exercice/serveur_atelier.ts.
 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -9,7 +11,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const DATA = fileURLToPath(new URL("../../data/", import.meta.url));
+const DATA = fileURLToPath(new URL("../../../data/", import.meta.url));
 
 type Enregistrement = Record<string, unknown>;
 
@@ -27,14 +29,15 @@ function resultat(donnees: unknown, erreur = false) {
 // indépendant. Il ne connaît que le protocole. Demain, plusieurs agents s'y brancheront.
 const serveur = new McpServer({ name: "atelier", version: "1.0.0" });
 
-// Pourquoi les mêmes noms et les mêmes descriptions qu'hier : pour le modèle, rien ne doit changer.
-// L'outil s'appelait mcp__atelier__lister_arrets dans l'agent, il s'appelle toujours ainsi :
-// « atelier » est maintenant le nom du serveur externe.
+// Correction 1, le mauvais aiguillage. Deux outils parlaient d'« arrêts » sans dire lesquels :
+// le modèle choisissait au hasard. Chaque description dit maintenant ce que l'outil couvre
+// (le détail de la semaine en cours ici, tout l'historique en version courte pour historique_arrets)
+// et renvoie vers l'autre.
 serveur.registerTool(
   "lister_arrets",
   {
     description:
-      "Liste les arrêts d'une machine de l'atelier sur la semaine en cours : date, durée, cause et ordre de fabrication concerné.",
+      "Liste les arrêts d'une machine sur la semaine en cours, avec le détail : date, durée, cause, commentaire et ordre de fabrication concerné. Pour chercher une récurrence sur une période plus longue, utiliser historique_arrets.",
     inputSchema: {
       machine_id: z
         .string()
@@ -46,8 +49,10 @@ serveur.registerTool(
   async ({ machine_id }) => resultat(charger("arrets_machine.json").filter((arret) => arret.machine_id === machine_id)),
 );
 
-// Pourquoi isError plutôt qu'un objet { erreur: ... } comme hier : le protocole a un champ prévu pour cela.
-// Le modèle lit le message et peut se corriger ; le harnais, lui, sait que l'appel a échoué.
+// Correction 2, l'erreur silencieuse. Pour un identifiant inconnu, l'outil renvoyait une fiche vide :
+// le modèle la prenait pour une vraie réponse. Il renvoie maintenant un résultat marqué isError,
+// avec un message qui dit quoi faire. C'est une erreur métier (la demande est bien formée,
+// mais l'objet n'existe pas) : le modèle doit la dire, pas réessayer.
 serveur.registerTool(
   "lire_ordre_fabrication",
   {
@@ -57,11 +62,12 @@ serveur.registerTool(
   },
   async ({ of_id }) => {
     const ordre = charger("ordres_fabrication.json").find((o) => o.id === of_id);
-    return ordre ? resultat(ordre) : resultat(`Aucun ordre de fabrication ${of_id}.`, true);
+    return ordre ? resultat(ordre) : resultat(
+          `Aucun ordre de fabrication ${of_id}. Vérifier l'identifiant auprès de l'utilisateur, sans en deviner un autre.`,
+          true,
+        );
   },
 );
-
-// ---------- Bonus : deux outils dont les agents de l'après-midi auront besoin ----------
 
 serveur.registerTool(
   "lister_controles_qualite",
@@ -73,12 +79,13 @@ serveur.registerTool(
   async ({ of_id }) => resultat(charger("controles_qualite.json").filter((controle) => controle.of_id === of_id)),
 );
 
-// Pourquoi un paramètre « depuis » : l'historique compte plusieurs centaines d'arrêts. Tout renvoyer
-// remplirait le contexte du modèle. Un serveur doit permettre de ne demander que l'utile.
+// Correction 3, la sortie trop grosse. L'outil renvoyait tout l'historique de la machine, avec tous
+// les champs. Il filtre maintenant à partir d'une date, et ne garde que quatre champs utiles.
+// Ce que l'outil renvoie reste dans le contexte jusqu'à la fin de la conversation.
 serveur.registerTool(
   "historique_arrets",
   {
-    description: "Liste les arrêts passés d'une machine, avant la semaine en cours : date, durée, catégorie, cause.",
+    description: "Liste tous les arrêts d'une machine depuis janvier 2026, semaine en cours comprise, en version courte : date, durée, catégorie, cause. Sert à chercher une récurrence.",
     inputSchema: {
       machine_id: z.string().describe("Identifiant de la machine, P1 à P4, A1 ou C1."),
       depuis: z
