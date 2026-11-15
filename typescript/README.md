@@ -16,4 +16,6 @@ Avant chaque TP, vérifiez que le fichier `.env` à la racine du dépôt contien
 | [TP 6](tp6-skills/README.md) | Un skill, et trois outils à corriger | 2 | 30 min |
 | [TP 7](tp7-multi-agents/README.md) | Agent v2 : un principal et trois spécialistes, comparés à l'agent seul | 2 | 1 h 55 |
 
+Hors TP : [demo-managed-agents](demo-managed-agents/README.md), le code de la démonstration du module 4 (jour 2). L'agent d'atelier, hébergé par Claude Managed Agents.
+
 Chaque dossier de TP contient son énoncé, ses dépendances, un dossier `exercice/` et un dossier `solution/`. Le TP 2 a en plus un dossier `enigmes/`. Le TP 3 fait exception : c'est du code complet, à lire et à lancer. Dans le TP 4, `solution/` ne contient que le fichier à compléter, corrigé.
