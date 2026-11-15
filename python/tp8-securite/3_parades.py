@@ -72,7 +72,7 @@ CONSIGNE_DU_JUGE = (
 def juger(texte: str) -> dict:
     reponse = client.messages.create(
         model=os.environ["MODELE"],
-        max_tokens=1000,
+        max_tokens=2000,  # sa réflexion compte aussi : à 1000, un texte encodé le coupait avant le verdict
         system=CONSIGNE_DU_JUGE,
         output_config={"format": {"type": "json_schema", "schema": VERDICT}},  # la sortie structurée
         messages=[{"role": "user", "content": f"<donnee>\n{texte}\n</donnee>"}],
@@ -99,7 +99,11 @@ async def relire_le_resultat(donnees, tool_use_id, contexte):
         propre = filtrer(resultat)
     else:
         debut = time.monotonic()
-        verdict = await asyncio.to_thread(juger, json.dumps(resultat, ensure_ascii=False))
+        try:
+            verdict = await asyncio.to_thread(juger, json.dumps(resultat, ensure_ascii=False))
+        except Exception as erreur:
+            # Pas de verdict : on retire le texte libre. Un hook qui plante laisserait passer le résultat tel quel.
+            verdict = {"suspect": True, "extrait": f"le juge n'a pas rendu de verdict ({type(erreur).__name__})"}
         print(f"  [juge] suspect : {verdict['suspect']} ({time.monotonic() - debut:.1f} s) {verdict['extrait'][:70]}")
         if not verdict["suspect"]:
             return {}

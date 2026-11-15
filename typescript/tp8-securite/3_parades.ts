@@ -60,7 +60,7 @@ const CONSIGNE_DU_JUGE =
 async function juger(texte: string): Promise<{ suspect: boolean; extrait: string }> {
   const reponse = await client.messages.create({
     model: MODELE,
-    max_tokens: 1000,
+    max_tokens: 2000, // sa réflexion compte aussi : à 1000, un texte encodé le coupait avant le verdict
     system: CONSIGNE_DU_JUGE,
     output_config: { format: { type: "json_schema", schema: VERDICT } }, // la sortie structurée
     messages: [{ role: "user", content: `<donnee>\n${texte}\n</donnee>` }],
@@ -91,7 +91,11 @@ const relireLeResultat: HookCallback = async (donnees) => {
     propre = filtrer(resultat);
   } else {
     const debut = performance.now();
-    const verdict = await juger(JSON.stringify(resultat));
+    // Pas de verdict : on retire le texte libre. Un hook qui plante laisserait passer le résultat tel quel.
+    const verdict = await juger(JSON.stringify(resultat)).catch((erreur: Error) => ({
+      suspect: true,
+      extrait: `le juge n'a pas rendu de verdict (${erreur.name})`,
+    }));
     console.log(`  [juge] suspect : ${verdict.suspect} (${((performance.now() - debut) / 1000).toFixed(1)} s) ${verdict.extrait.slice(0, 70)}`);
     if (!verdict.suspect) return {};
     alertes.push(verdict.extrait.slice(0, 70));
