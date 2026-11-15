@@ -16,3 +16,6 @@ node_modules/
 .chainlit/
 .files/
 demandes_intervention.json
+
+# TP 5
+memoire.json
