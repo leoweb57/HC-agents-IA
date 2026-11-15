@@ -63,5 +63,47 @@ serveur.registerTool(
     resultat(lireNotes().filter((n) => n.note.toLowerCase().includes(recherche.trim().toLowerCase()))),
 );
 
+// Un serveur peut proposer autre chose que des outils (voir les slides « ressources » et « prompts »).
+
+// Une ressource : une donnée en lecture, désignée par une adresse. Ce n'est pas le modèle qui la demande :
+// c'est l'application (le harnais, l'interface) qui choisit de la lire et de l'ajouter au contexte.
+serveur.registerResource(
+  "toutes_les_notes",
+  "memoire://notes",
+  { description: "Toutes les notes de la mémoire, une par ligne.", mimeType: "text/plain" },
+  async (adresse) => ({
+    contents: [
+      {
+        uri: adresse.href,
+        text:
+          lireNotes()
+            .map((n) => `${n.auteur} : ${n.note}`)
+            .join("\n") || "Aucune note.",
+      },
+    ],
+  }),
+);
+
+// Un prompt : une demande toute prête, avec ses paramètres. C'est l'utilisateur qui la déclenche,
+// par exemple depuis un menu ou une commande de l'interface.
+serveur.registerPrompt(
+  "faire_le_point",
+  {
+    description: "Fait le point sur ce que la mémoire contient à propos d'un sujet.",
+    argsSchema: { sujet: z.string() },
+  },
+  ({ sujet }) => ({
+    messages: [
+      {
+        role: "user",
+        content: {
+          type: "text",
+          text: `Relis la mémoire et fais le point sur « ${sujet} » : ce qui a été noté, par qui, et ce qui reste à décider.`,
+        },
+      },
+    ],
+  }),
+);
+
 // 3. On lance le serveur, en transport stdio : l'entrée et la sortie standard.
 await serveur.connect(new StdioServerTransport());

@@ -48,6 +48,24 @@ def lire_memoire(recherche: str = "") -> list[dict]:
     return [note for note in lire_notes() if recherche.strip().lower() in note["note"].lower()]
 
 
+# Un serveur peut proposer autre chose que des outils (voir les slides « ressources » et « prompts »).
+
+# Une ressource : une donnée en lecture, désignée par une adresse. Ce n'est pas le modèle qui la demande :
+# c'est l'application (le harnais, l'interface) qui choisit de la lire et de l'ajouter au contexte.
+@serveur.resource("memoire://notes")
+def toutes_les_notes() -> str:
+    """Toutes les notes de la mémoire, une par ligne."""
+    return "\n".join(f"{note['auteur']} : {note['note']}" for note in lire_notes()) or "Aucune note."
+
+
+# Un prompt : une demande toute prête, avec ses paramètres. C'est l'utilisateur qui la déclenche,
+# par exemple depuis un menu ou une commande de l'interface.
+@serveur.prompt()
+def faire_le_point(sujet: str) -> str:
+    """Fait le point sur ce que la mémoire contient à propos d'un sujet."""
+    return f"Relis la mémoire et fais le point sur « {sujet} » : ce qui a été noté, par qui, et ce qui reste à décider."
+
+
 # 3. On lance le serveur. Transport par défaut : stdio, c'est-à-dire l'entrée et la sortie standard.
 if __name__ == "__main__":
     serveur.run()
