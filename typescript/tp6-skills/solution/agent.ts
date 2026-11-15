@@ -25,7 +25,6 @@ process.removeAllListeners("warning");
 
 const MODELE = process.env.MODELE ?? "";
 const TP = path.resolve(".");
-const SKILL = path.resolve(".claude/skills/diagnostic-arret");
 const DEMANDES = path.resolve("demandes_intervention.json");
 const SERVEUR_ATELIER = path.resolve("exercice/serveur_atelier.ts");
 
@@ -133,15 +132,11 @@ function creerPermission(demanderAccord?: DemanderAccord): CanUseTool {
       return { behavior: "deny", message: "La création a été refusée par l'utilisateur." };
     }
 
-    // Read, l'outil intégré du SDK : seulement dans le dossier du skill.
-    // Pourquoi : le skill dit au modèle de lire ses procédures. On lui ouvre ce dossier, et rien d'autre.
+    // Read, l'outil intégré du SDK. Dans le dossier de travail (cwd, ici le dossier du TP), le SDK laisse
+    // lire sans rien demander : c'est ce qui permet au modèle de lire les procédures du skill.
+    // Pourquoi ce refus : hors de ce dossier, Read arrive ici, et rien ne justifie de l'ouvrir.
     if (nomOutil === "Read") {
-      // Pourquoi path.resolve : pour qu'un chemin comme ../../.env soit ramené à son vrai dossier avant le test.
-      const chemin = path.resolve(TP, String(parametres.file_path ?? ""));
-      if (chemin.startsWith(SKILL + path.sep)) {
-        return { behavior: "allow", updatedInput: parametres };
-      }
-      return { behavior: "deny", message: "Lecture limitée au dossier du skill." };
+      return { behavior: "deny", message: "Lecture limitée au dossier du TP." };
     }
 
     return { behavior: "deny", message: "Outil non autorisé." };
@@ -151,9 +146,8 @@ function creerPermission(demanderAccord?: DemanderAccord): CanUseTool {
 // ---------- 5. Les options : tout ce qui décrit l'agent (étapes 3, 5, 6, 7 et 8) ----------
 
 // Pourquoi tools et allowedTools sont deux listes : tools dit quels outils intégrés existent pour le modèle,
-// allowedTools dit lesquels s'exécutent sans rien demander. L'outil d'action et Read n'y sont pas :
-// ils passent donc par canUseTool.
-// sur la machine, et l'agent ne se comporte plus de la même façon d'un poste à l'autre.
+// allowedTools dit lesquels s'exécutent sans rien demander. L'outil d'action n'y est pas : il passe donc
+// par canUseTool. Read n'y est pas non plus, mais le SDK laisse lire dans le dossier de travail.
 
 export function creerOptions(sessionId?: string, demanderAccord?: DemanderAccord): Options {
   return {

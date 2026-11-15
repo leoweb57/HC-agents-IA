@@ -33,7 +33,6 @@ warnings.filterwarnings("ignore", category=CanUseToolShadowedWarning)
 
 MODELE = os.environ["MODELE"]
 TP = Path(__file__).resolve().parents[1]
-SKILL = TP / ".claude" / "skills" / "diagnostic-arret"
 DEMANDES = TP / "demandes_intervention.json"
 SERVEUR_ATELIER = TP / "exercice" / "serveur_atelier.py"
 
@@ -139,13 +138,11 @@ def creer_permission(demander_accord):
                 return PermissionResultAllow(updated_input=parametres)
             return PermissionResultDeny(message="La création a été refusée par l'utilisateur.")
 
-        # Read, l'outil intégré du SDK : seulement dans le dossier du skill, où sont les procédures.
+        # Read, l'outil intégré du SDK. Dans le dossier de travail (cwd, ici le dossier du TP), le SDK laisse
+        # lire sans rien demander : c'est ce qui permet au modèle de lire les procédures du skill.
+        # Hors de ce dossier, Read arrive ici, et rien ne justifie de l'ouvrir.
         if nom_outil == "Read":
-            chemin = Path(parametres.get("file_path", ""))
-            chemin = (chemin if chemin.is_absolute() else TP / chemin).resolve()
-            if SKILL in chemin.parents:
-                return PermissionResultAllow(updated_input=parametres)
-            return PermissionResultDeny(message="Lecture limitée au dossier du skill.")
+            return PermissionResultDeny(message="Lecture limitée au dossier du TP.")
 
         return PermissionResultDeny(message="Outil non autorisé.")
 
@@ -155,8 +152,8 @@ def creer_permission(demander_accord):
 # ---------- 5. Les options : tout ce qui décrit l'agent (étapes 3, 5, 6, 7 et 8) ----------
 
 # Pourquoi tools et allowed_tools sont deux listes : tools dit quels outils intégrés existent pour le modèle,
-# allowed_tools dit lesquels s'exécutent sans rien demander. L'outil d'action et Read n'y sont pas :
-# ils passent donc par can_use_tool.
+# allowed_tools dit lesquels s'exécutent sans rien demander. L'outil d'action n'y est pas : il passe donc
+# par can_use_tool. Read n'y est pas non plus, mais le SDK laisse lire dans le dossier de travail.
 
 def creer_options(session_id: str | None = None, demander_accord=None) -> ClaudeAgentOptions:
     return ClaudeAgentOptions(
