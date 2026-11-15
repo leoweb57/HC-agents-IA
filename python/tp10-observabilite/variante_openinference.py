@@ -1,6 +1,5 @@
 """TP 10, variante : la même question, tracée par une instrumentation automatique.
 
-    pip install openinference-instrumentation-claude-agent-sdk
     python variante_openinference.py "Où en est l'OF-2231 ?"
 
 C'est la voie que documente Langfuse pour le Claude Agent SDK : deux lignes, et le SDK est tracé.

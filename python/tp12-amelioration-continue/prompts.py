@@ -7,6 +7,7 @@ Changer le prompt de l'agent, c'est déplacer l'étiquette : pas de livraison de
 Le dépôt garde une copie de chaque version dans prompts/ : elle sert à publier, et de secours sans Langfuse.
 """
 
+import logging
 from pathlib import Path
 
 from dotenv import find_dotenv, load_dotenv
@@ -27,11 +28,16 @@ def copie_locale(etiquette: str) -> str:
 def lire_prompt(etiquette: str = "production"):
     """Renvoie le prompt qui porte cette étiquette dans Langfuse. Le texte est dans .prompt, le numéro dans .version."""
     secours = copie_locale(etiquette)
+    journal = logging.getLogger("langfuse")
+    niveau = journal.level
+    journal.setLevel(logging.CRITICAL)  # un prompt pas encore publié n'est pas une erreur ici : on fait taire le SDK
     try:
         # cache_ttl_seconds=0 : on relit Langfuse à chaque fois. En production, on garderait le cache d'une minute.
         return langfuse.get_prompt(NOM, label=etiquette, fallback=secours, cache_ttl_seconds=0, max_retries=0, fetch_timeout_seconds=3)
     except Exception:
         return None  # Langfuse n'est pas configuré : l'appelant prendra la copie locale
+    finally:
+        journal.setLevel(niveau)
 
 
 def texte_du_prompt(etiquette: str = "production") -> tuple[str, object]:

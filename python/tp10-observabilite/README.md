@@ -7,7 +7,7 @@
 - Avoir une trace par question, avec chaque appel au modèle et chaque outil, leur durée, leurs tokens et leur coût.
 - Regrouper les traces d'une conversation dans une session, et les rattacher à un utilisateur.
 - Poser un score sur une trace depuis l'agent : l'avis de l'utilisateur.
-- Comparer trois façons de tracer l'Agent SDK.
+- Comparer trois façons de tracer l'Agent SDK, et voir pourquoi un appel direct à l'API n'en a pas besoin.
 
 ## Installer Langfuse en local
 
@@ -47,14 +47,15 @@ Toutes les commandes se lancent depuis ce dossier.
 | `agent.py` | L'agent du TP 6, réuni dans un seul fichier. Fourni. |
 | `suivi.py` | La traduction du flux de messages du SDK en observations Langfuse. Fourni : une centaine de lignes à lire. |
 | `terminal.py` | Une conversation tracée : le décorateur `@observe`, la session, l'utilisateur, l'avis en score. |
+| `variante_api_directe.py` | Un appel direct à l'API : le SDK Anthropic le trace tout seul. |
 | `variante_openinference.py` | La même question, tracée par une instrumentation automatique : deux lignes. |
 | `variante_otel_natif.py` | La même question, tracée par l'export OpenTelemetry du SDK : aucune ligne, des variables d'environnement. |
 
 ```bash
 python terminal.py                 # posez deux ou trois questions, donnez votre avis
 python terminal.py chef-equipe-2   # la même chose, au nom d'un autre utilisateur
+python variante_api_directe.py
 python variante_otel_natif.py
-pip install openinference-instrumentation-claude-agent-sdk
 python variante_openinference.py
 ```
 
@@ -69,7 +70,9 @@ python variante_openinference.py
 
 ## Pourquoi un fichier `suivi.py`
 
-Avec l'Agent SDK, la boucle tourne dans un autre processus : il n'y a pas d'appel au modèle à décorer dans notre code. On décore donc notre fonction (`@observe` : c'est la racine de la trace), et on reconstruit le reste à partir de ce que le SDK raconte dans son flux de messages.
+Avec un appel direct à l'API, il n'y a rien à faire : le SDK Anthropic émet lui-même une trace OpenTelemetry par appel (modèle, tokens, durée), et Langfuse la reçoit. C'est `variante_api_directe.py` : un décorateur sur notre fonction, et l'appel se range dessous.
+
+Avec l'Agent SDK, la boucle tourne dans un autre processus : ses appels au modèle ne passent pas par notre code. On décore donc notre fonction (`@observe` : c'est la racine de la trace), et on reconstruit le reste à partir de ce que le SDK raconte dans son flux de messages.
 
 Deux pièges, rencontrés en écrivant ce fichier :
 

@@ -2,3 +2,5 @@ claude-agent-sdk
 mcp>=2
 python-dotenv
 langfuse>=5
+openinference-instrumentation-claude-agent-sdk
+anthropic

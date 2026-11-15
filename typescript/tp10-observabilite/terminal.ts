@@ -1,0 +1,88 @@
+// TP 10 : une conversation avec l'agent, tracée dans Langfuse.
+//
+// Lancement, depuis le dossier du TP :
+//   npx tsx terminal.ts                 une conversation au clavier
+//   npx tsx terminal.ts chef-equipe-2   la même, au nom d'un autre utilisateur
+//
+// Ce qui part vers Langfuse :
+//   - une trace par question, rangée dans une session (une session = une conversation) ;
+//   - l'utilisateur, pour retrouver ses conversations ;
+//   - votre avis sur la réponse, sous la forme d'un score attaché à la trace.
+// Sans Langfuse, le programme tourne quand même : il n'envoie rien.
+
+import { randomUUID } from "node:crypto";
+import { appendFileSync } from "node:fs";
+import path from "node:path";
+import { createInterface } from "node:readline/promises";
+import { query } from "@anthropic-ai/claude-agent-sdk";
+import { getActiveTraceId, observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
+import { type DemanderAccord, TP, creerOptions } from "./agent.ts";
+import { AVEC_LANGFUSE, langfuse, toutEnvoyer } from "./langfuse.ts";
+import { Suivi, resume } from "./suivi.ts";
+
+const RETOURS = path.join(TP, "retours.jsonl");
+const clavier = createInterface({ input: process.stdin, output: process.stdout });
+
+const demanderAccord: DemanderAccord = async (nomOutil, parametres) => {
+  console.log(`  L'agent veut créer une demande d'intervention : ${JSON.stringify(parametres)}`);
+  const reponse = await clavier.question("  Valider ? (o/n) ");
+  return reponse.trim().toLowerCase().startsWith("o");
+};
+
+// observe() : chaque appel de cette fonction devient une trace, et la fonction en est la racine.
+// On ne garde pas ses paramètres comme entrée de la trace : l'entrée, c'est la question.
+const poser = observe(
+  async (question: string, sessionClaude?: string) => {
+    updateActiveObservation({ input: question }, { asType: "agent" });
+    const suivi = new Suivi(question);
+    const options = suivi.brancher(creerOptions(sessionClaude, demanderAccord));
+    for await (const message of query({ prompt: question, options })) {
+      suivi.voir(message); // chaque message du SDK devient une observation, ou en complète une
+    }
+    return { bilan: suivi.bilan, traceId: getActiveTraceId() ?? "" };
+  },
+  { name: "agent-atelier", asType: "agent", captureInput: false, captureOutput: false },
+);
+
+/** L'adresse de la trace dans Langfuse, ou son identifiant si le serveur ne répond pas. */
+async function adresse(traceId: string): Promise<string> {
+  if (!AVEC_LANGFUSE) return traceId || "(pas de trace : Langfuse n'est pas configuré)";
+  try {
+    return await langfuse.getTraceUrl(traceId);
+  } catch {
+    return traceId;
+  }
+}
+
+/** Le retour de l'utilisateur : un score sur la trace, et une ligne dans un fichier local. */
+async function noter(traceId: string, question: string, reponse: string): Promise<void> {
+  const avis = (await clavier.question("  Cette réponse vous a-t-elle aidé ? (o/n, Entrée pour passer) ")).trim().toLowerCase();
+  if (!avis) return;
+  const utile = avis.startsWith("o");
+  const commentaire = utile ? "" : (await clavier.question("  Qu'est-ce qui n'allait pas ? ")).trim();
+  if (AVEC_LANGFUSE) {
+    langfuse.score.create({ traceId, name: "avis_utilisateur", value: utile ? 1 : 0, dataType: "BOOLEAN", comment: commentaire || undefined });
+  }
+  // La même information en local : le TP 12 s'en sert, même sans Langfuse.
+  appendFileSync(RETOURS, `${JSON.stringify({ trace_id: traceId, question, reponse, utile, commentaire })}\n`);
+}
+
+const utilisateur = process.argv[2] ?? "chef-equipe-1";
+const conversation = `conversation-${randomUUID().slice(0, 8)}`; // la session Langfuse : une par conversation
+let sessionClaude: string | undefined; // la session du SDK : la mémoire de la conversation
+console.log(`Session Langfuse : ${conversation}. Posez vos questions. Ligne vide pour quitter.`);
+while (true) {
+  const question = await clavier.question("\nVous : ");
+  if (!question.trim()) break;
+  // Ce qui vaut pour toute la trace : la session, l'utilisateur, des étiquettes pour filtrer.
+  const { bilan, traceId } = await propagateAttributes({ sessionId: conversation, userId: utilisateur, tags: ["atelier", "tp10"] }, () =>
+    poser(question, sessionClaude),
+  );
+  sessionClaude = bilan.session;
+  console.log(`\nAgent : ${bilan.reponse}`);
+  console.log(`  [bilan] ${resume(bilan)}`);
+  console.log(`  [trace] ${await adresse(traceId)}`);
+  await noter(traceId, question, bilan.reponse);
+}
+clavier.close();
+await toutEnvoyer(); // on attend que tout soit parti avant de quitter

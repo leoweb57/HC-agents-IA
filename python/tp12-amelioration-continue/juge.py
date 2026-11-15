@@ -76,7 +76,7 @@ async def juger(critere: str, **elements: str) -> dict:
     contenu = "\n\n".join(f"<{BALISES[e]}>\n{elements[e]}\n</{BALISES[e]}>" for e in definition["elements"])
     reponse = await client.messages.create(
         model=MODELE_DU_JUGE,
-        max_tokens=1000,
+        max_tokens=2000,  # le raisonnement interne du modèle compte dans cette limite
         system=CONSIGNE,
         output_config={"format": {"type": "json_schema", "schema": VERDICT}},  # la sortie structurée : du JSON conforme au schéma
         messages=[{"role": "user", "content": f"{contenu}\n\n{definition['question']}"}],
