@@ -164,7 +164,7 @@ Pour la discussion :
 - **L'arrière-plan.** Dans les options, retirez `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS` et redemandez le diagnostic, deux ou trois fois. Le principal répond-il avant d'avoir le rapport ?
 - **Une limite par spécialiste.** Ajoutez `maxTurns: 2` au spécialiste maintenance et redemandez le diagnostic. Que reçoit le principal ? Que fait-il ?
 - **Un mauvais aiguillage.** « Combien de défauts d'éjection sur la presse 4 ces 30 derniers jours ? » À qui le principal délègue-t-il ? La v1 répond 3. Reprenez les descriptions des spécialistes.
-- **Sans la règle.** Retirez un spécialiste, le hook `lePrincipalDelegue` et la ligne `disallowedTools`. Que fait le principal quand personne ne peut répondre ?
+- **Le fork.** Mettez en commentaire la ligne `disallowedTools` et les spécialistes production et maintenance, puis demandez « Où en est l'OF-2231 ? », trois ou quatre fois. Cherchez « fork » dans le journal : qui a lu l'ordre de fabrication, et avec quels outils ?
 
 ## Solution
 
