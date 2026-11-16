@@ -25,7 +25,7 @@ const clavier = createInterface({ input: process.stdin, output: process.stdout }
 
 const demanderAccord: DemanderAccord = async (nomOutil, parametres) => {
   console.log(`  L'agent veut créer une demande d'intervention : ${JSON.stringify(parametres)}`);
-  const reponse = await clavier.question("  Valider ? (o/n) ");
+  const reponse = await demander("  Valider ? (o/n) ");
   return reponse.trim().toLowerCase().startsWith("o");
 };
 
@@ -55,12 +55,21 @@ async function adresse(traceId: string): Promise<string> {
   }
 }
 
+/** Une saisie au clavier. Si l'entrée est fermée (Ctrl+D), on rend une ligne vide : le programme s'arrête proprement. */
+async function demander(texte: string): Promise<string> {
+  try {
+    return await clavier.question(texte);
+  } catch {
+    return "";
+  }
+}
+
 /** Le retour de l'utilisateur : un score sur la trace, et une ligne dans un fichier local. */
 async function noter(traceId: string, question: string, reponse: string): Promise<void> {
-  const avis = (await clavier.question("  Cette réponse vous a-t-elle aidé ? (o/n, Entrée pour passer) ")).trim().toLowerCase();
+  const avis = (await demander("  Cette réponse vous a-t-elle aidé ? (o/n, Entrée pour passer) ")).trim().toLowerCase();
   if (!avis) return;
   const utile = avis.startsWith("o");
-  const commentaire = utile ? "" : (await clavier.question("  Qu'est-ce qui n'allait pas ? ")).trim();
+  const commentaire = utile ? "" : (await demander("  Qu'est-ce qui n'allait pas ? ")).trim();
   if (AVEC_LANGFUSE) {
     langfuse.score.create({ traceId, name: "avis_utilisateur", value: utile ? 1 : 0, dataType: "BOOLEAN", comment: commentaire || undefined });
   }
@@ -73,7 +82,7 @@ const conversation = `conversation-${randomUUID().slice(0, 8)}`; // la session L
 let sessionClaude: string | undefined; // la session du SDK : la mémoire de la conversation
 console.log(`Session Langfuse : ${conversation}. Posez vos questions. Ligne vide pour quitter.`);
 while (true) {
-  const question = await clavier.question("\nVous : ");
+  const question = await demander("\nVous : ");
   if (!question.trim()) break;
   // Ce qui vaut pour toute la trace : la session, l'utilisateur, des étiquettes pour filtrer.
   const { bilan, traceId } = await propagateAttributes({ sessionId: conversation, userId: utilisateur, tags: ["atelier", "production"] }, () =>
