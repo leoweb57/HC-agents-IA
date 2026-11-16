@@ -15,7 +15,7 @@ Avant chaque TP, vérifiez que le fichier `.env` à la racine du dépôt contien
 | [TP 5](tp5-mcp/README.md) | Écrire un serveur MCP et le brancher sur l'agent | 2 | 40 min |
 | [TP 6](tp6-skills/README.md) | Un skill, et trois outils à corriger | 2 | 30 min |
 | [TP 7](tp7-multi-agents/README.md) | Agent v2 : un principal et trois spécialistes, comparés à l'agent seul | 2 | 1 h 55 |
-| [TP 8](tp8-securite/README.md) | Sécurité : détourner l'agent par ses données, puis le défendre | 3 | 30 min |
+| [TP 8](tp8-securite/README.md) | Sécurité : quatre cas du module, sans la parade puis avec | 3 | 30 min |
 | [TP 9](tp9-couts/README.md) | Coûts et contexte : cache, compaction, recherche d'outils, modèles | 3 | 30 min |
 | [TP 10](tp10-observabilite/README.md) | Observabilité : les traces de l'agent dans Langfuse | 3 | 40 min |
 | [TP 11](tp11-evaluation/README.md) | Évaluation : un jeu de questions, un juge, une référence | 3 | 30 min |
