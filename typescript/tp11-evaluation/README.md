@@ -53,31 +53,6 @@ npx tsx evaluer.ts v2               # évalue la v2 : se termine en erreur
 
 L'ancrage et la pertinence n'ont pas besoin de réponse attendue : on peut les mesurer sur des conversations réelles. L'exactitude et la complétude demandent un jeu qualifié.
 
-## Ce qu'on a mesuré
-
-Avec Claude Haiku 5.5 pour l'agent et pour le juge, le 15 novembre 2026. Une évaluation prend environ une minute. L'agent coûte 0,007 $ pour les dix cas ; les quarante appels du juge s'y ajoutent.
-
-**La v1** : 1,00 partout sur la plupart des passes. D'une passe à l'autre, un cas sur dix peut basculer : c'est la tolérance retenue pour les notes du juge.
-
-**La v2** (« une seule phrase courte ») :
-
-```
-moyenne               v2   référence     écart
-exact.              1.00        1.00     +0.00
-complét.            1.00        0.90     +0.10
-ancrage             1.00        1.00     +0.00
-pertin.             1.00        1.00     +0.00
-outils              1.00        1.00     +0.00
-consignes           0.90        1.00     -0.10   RÉGRESSION
-étapes              2.10        2.10     +0.00
-coût $            0.0007      0.0007   +0.0000
-durée s             6.16        7.05     -0.89
-
-Régression : le prompt v2 fait moins bien que la référence. On ne le met pas en production.
-```
-
-Le diagnostic a perdu ses quatre lignes (Constat, Récurrence, Procédure, Recommandation). Les quatre juges n'ont rien vu : la réponse reste exacte, complète, ancrée et pertinente. C'est le contrôle par le code qui l'attrape. Le programme sort avec le code 1 : branché sur l'intégration continue, il bloque la livraison.
-
 ## Un juge se met au point comme l'agent
 
 Trois leçons de la mise au point, toutes mesurées :

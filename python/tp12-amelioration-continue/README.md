@@ -60,32 +60,6 @@ Un avis dit que quelque chose ne va pas. Il ne dit pas ce qu'il fallait répondr
 
 La correction tient en une ligne du prompt (`prompts/v3.md`) : « Quand on te demande où en est un ordre de fabrication, regarde aussi les arrêts de sa machine et signale ceux d'aujourd'hui. »
 
-## Ce qu'on a mesuré
-
-Avec Claude Haiku 5.5 pour l'agent et pour le juge, le 15 novembre 2026, sur les douze cas.
-
-```
-moyenne               v3   référence     écart
-exact.              1.00        1.00     +0.00
-complét.            1.00        0.75     +0.25
-ancrage             1.00        1.00     +0.00
-pertin.             1.00        1.00     +0.00
-outils              1.00        1.00     +0.00
-consignes           1.00        1.00     +0.00
-étapes              2.50        2.17     +0.33
-coût $            0.0008      0.0007   +0.0001
-durée s             7.26        6.67     +0.59
-```
-
-La v1 échouait sur les trois nouveaux cas (complétude : 9 sur 12). La v3 les passe, et rien d'autre ne bouge. Le prix : un appel au modèle de plus sur ces trois questions, pour aller lire les arrêts.
-
-Après la mise en production, sans toucher au code ni relancer quoi que ce soit d'autre :
-
-> **Question** : Où en est l'OF-2231 ?
-> **Réponse** : L'OF-2231 (boîtier B14, presse P4) est en cours : 1 740 pièces produites sur 3 000 prévues, débuté le 12 mars à 6 h 00. Aujourd'hui, P4 a eu une panne à 7 h 42 pendant 74 minutes (défaut d'éjection, éjecteur grippé, redémarrage à 8 h 56). […]
-
-Pour revenir en arrière : `python 3_promouvoir.py v1`.
-
 ## Repartir de zéro
 
 Supprimez `jeu_enrichi.json`, `reference.json` et `retours.jsonl` dans ce dossier. Dans Langfuse, rien à effacer : relancer `publier.py` remet le jeu de dix cas.

@@ -45,21 +45,6 @@ python raisonnement.py
 python comparer.py
 ```
 
-## Ce qu'on a mesuré
-
-Avec Claude Haiku 5.5, le 14 novembre 2026. Vos chiffres varieront d'un essai à l'autre, pas les ordres de grandeur.
-
-| Pattern | Appels au modèle | Tokens en entrée | Tokens en sortie |
-|---|---|---|---|
-| ReAct | 3 | environ 4 200 | environ 900 |
-| Plan-and-Execute | 10 | environ 17 000 | environ 5 000 |
-| Plan-and-Execute avec replanification | 13 à 15 | 24 000 à 32 000 | 7 000 à 10 000 |
-| Reflection | 6 ou 7 | 14 000 à 17 000 | 3 000 à 5 000 |
-
-Les trois réponses contiennent les mêmes faits. Sur une demande de cette taille, ReAct suffit : les autres patterns coûtent quatre à sept fois plus pour un résultat équivalent.
-
-Pour le niveau de raisonnement : entre `low` et `high`, le modèle a fait les mêmes trois appels, avec 20 à 35 % de tokens en sortie en plus.
-
 ## À essayer
 
 - Remplacer la demande, dans `react.py`, par une demande plus large (toutes les presses, par exemple) et relancer `comparer.py`.
